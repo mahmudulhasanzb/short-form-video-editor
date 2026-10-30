@@ -7,6 +7,7 @@ import { FullCanvas } from "../layouts/FullCanvas";
 import { ModeATalkingCaption } from "../captions/ModeATalkingCaption";
 import { ModeBStatementLockup } from "../captions/ModeBStatementLockup";
 import { UICardLifespan } from "../motion/UICardLifespan";
+import { GenericComposition } from "./GenericComposition";
 
 // UI Card Components
 import { DarkGlassNumberedPill } from "../cards/DarkGlassNumberedPill";
@@ -56,6 +57,29 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({ scene }) => {
       </div>
     );
   }
+
+  // Phase 3: render a generic composition if compositionElements are present.
+  // This does NOT delete old cards. If elements are present, they win over a forced card.
+  // If elements are absent, the old card switch below is the fallback.
+  const renderGenericComposition = () => {
+    if (!scene.compositionElements || scene.compositionElements.length === 0) return null;
+    return (
+      <GenericComposition
+        elements={scene.compositionElements}
+        sceneStartFrame={scene.startFrame}
+        sansFontFamily={scene.sansFontFamily}
+        scriptFontFamily={scene.scriptFontFamily}
+      />
+    );
+  };
+
+  const hasVisualArtifact = () => {
+    const hasCard = scene.uiCardNeed !== undefined && scene.uiCardNeed !== null && scene.uiCardNeed !== "none";
+    const hasElements = Array.isArray(scene.compositionElements) && scene.compositionElements.length > 0;
+    const hasSource = Boolean(scene.sourceReference?.fileName);
+    const hasComposition = scene.compositionType !== undefined && scene.compositionType !== null && scene.compositionType !== "none";
+    return hasCard || hasElements || hasSource || hasComposition;
+  };
 
   // Render UI Card component if requested
   const renderUICard = () => {
@@ -159,6 +183,8 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({ scene }) => {
           variant={variant}
           fontSize={customFontSize || scene.fontSize}
           highlightFontSize={customHighlightFontSize || scene.highlightFontSize}
+          sansFontFamily={scene.sansFontFamily}
+          scriptFontFamily={scene.scriptFontFamily}
         />
       );
     }
@@ -170,6 +196,8 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({ scene }) => {
           title={title}
           fontSize={customFontSize || scene.fontSize}
           highlightFontSize={customHighlightFontSize || scene.highlightFontSize}
+          sansFontFamily={scene.sansFontFamily}
+          scriptFontFamily={scene.scriptFontFamily}
         />
       );
     }
@@ -219,6 +247,33 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({ scene }) => {
           : scene.uiCardEndFrame;
     }
 
+    // Phase 3 blank-split fix: if composition elements exist, use their latest end frame as the visual end.
+    if (scene.compositionElements && scene.compositionElements.length > 0) {
+      const ends = scene.compositionElements
+        .map((el) => (el.endFrame !== undefined && el.endFrame !== null ? (el.endFrame >= scene.startFrame ? el.endFrame - scene.startFrame : el.endFrame) : undefined))
+        .filter((v): v is number => v !== undefined);
+      if (ends.length > 0) {
+        relCardEnd = Math.max(...ends);
+      }
+    }
+
+    // Phase 3 blank-split fix, part 1: no visual artifact at all, never enter Split.
+    // This also covers the old bug where a Split with no card end frame and no source could enter Split with an empty top.
+    if (!hasVisualArtifact()) {
+      return (
+        <FullSpeaker
+          speakerSrc={effectiveSpeakerSrc}
+          startFrom={scene.startFrame}
+          muted={true}
+          lowerThird={
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 20 }}>
+              {renderCaption("dark-bg", 52, 84)}
+            </div>
+          }
+        />
+      );
+    }
+
     // Dynamic runtime guard: if the card has finished its topic and exited, and no sourceReference
     // is present, dynamically return to Full Speaker with white text so the canvas is NEVER left blank!
     if (!hasSource && relCardEnd !== undefined && frame >= relCardEnd) {
@@ -255,8 +310,8 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({ scene }) => {
               paddingBottom: 24,
             }}
           >
-            <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              {renderUICard()}
+            <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", width: "100%" }}>
+              {renderGenericComposition() || renderUICard()}
             </div>
             {renderCaption("light-bg")}
           </div>
@@ -271,8 +326,8 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({ scene }) => {
       variant={scene.canvasVariant || "warm-grid"}
       statementLockup={scene.captionMode === "Mode B" ? renderCaption("light-bg") : undefined}
     >
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 32 }}>
-        {renderUICard()}
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 32, width: "100%" }}>
+        {renderGenericComposition() || renderUICard()}
         {scene.captionMode === "Mode A" && renderCaption("light-bg")}
       </div>
     </FullCanvas>
