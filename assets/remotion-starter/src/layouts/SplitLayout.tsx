@@ -19,6 +19,7 @@ export const SplitLayout: React.FC<SplitLayoutProps> = ({
   bottomPersonContent,
   cropMeasurements,
   canvasVariant = "warm-grid",
+  sideFill = false,
 }) => {
   const getTopBackgroundStyle = (): React.CSSProperties => {
     switch (canvasVariant) {
@@ -60,6 +61,9 @@ export const SplitLayout: React.FC<SplitLayoutProps> = ({
           padding: "50px 40px 24px 40px",
           boxSizing: "border-box",
           zIndex: 2,
+          // Phase 3b bottom fade: top canvas fades out over its last ~100px, about 20% of its height.
+          WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 80%, transparent 100%)",
+          maskImage: "linear-gradient(to bottom, black 0%, black 80%, transparent 100%)",
           ...getTopBackgroundStyle(),
         }}
       >
@@ -94,18 +98,10 @@ export const SplitLayout: React.FC<SplitLayoutProps> = ({
         </div>
       </div>
 
-      {/* Clean 50% split line boundary (no heavy divider) */}
-      <div
-        style={{
-          position: "absolute",
-          top: "50%",
-          left: 0,
-          width: "100%",
-          height: 1,
-          backgroundColor: "rgba(0,0,0,0.06)",
-          zIndex: 4,
-        }}
-      />
+      {/* Phase 3b: No hard split line. The top canvas itself fades out at its bottom edge,
+          over the last 100px, so the split does not look like a hard rectangle cut.
+          This is implemented as a mask on the top canvas container in the code below,
+          see getTopBackgroundStyle usage, not as a separate opaque band. */}
 
       {/* LAYER B: Bottom Person Layer (50% to 100% height) - PERSON ONLY */}
       <div
@@ -126,6 +122,7 @@ export const SplitLayout: React.FC<SplitLayoutProps> = ({
             muted={muted}
             measurements={cropMeasurements}
             containerHeight={960}
+            sideFill={sideFill}
           />
         )}
       </div>
