@@ -8,6 +8,7 @@ import { ModeATalkingCaption } from "../captions/ModeATalkingCaption";
 import { ModeBStatementLockup } from "../captions/ModeBStatementLockup";
 import { UICardLifespan } from "../motion/UICardLifespan";
 import { GenericComposition } from "./GenericComposition";
+import { CaptionBackground } from "../captions/CaptionBackground";
 
 // UI Card Components
 import { DarkGlassNumberedPill } from "../cards/DarkGlassNumberedPill";
@@ -62,6 +63,8 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({ scene }) => {
   // This does NOT delete old cards. If elements are present, they win over a forced card.
   // If elements are absent, the old card switch below is the fallback.
   const renderGenericComposition = () => {
+    // Phase 3b card toggle: off means no composition, no card, in preview and render.
+    if (scene.cardVisualsEnabled === false) return null;
     if (!scene.compositionElements || scene.compositionElements.length === 0) return null;
     return (
       <GenericComposition
@@ -83,6 +86,7 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({ scene }) => {
 
   // Render UI Card component if requested
   const renderUICard = () => {
+    if (scene.cardVisualsEnabled === false) return null;
     const props = (scene.uiCardProps || {}) as Record<string, unknown>;
 
     let cardElement: React.ReactNode = null;
@@ -174,18 +178,22 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({ scene }) => {
     customFontSize?: number,
     customHighlightFontSize?: number
   ) => {
+    // Phase 3b: caption background is tight fade-blur by default, not a full-width box.
+    const bgStyle = scene.captionBackgroundStyle || "fade-blur";
     if (scene.captionMode === "Mode A") {
       return (
-        <ModeATalkingCaption
-          chunks={scene.captionChunks}
-          tokens={scene.captionTokens}
-          sceneStartFrame={scene.startFrame}
-          variant={variant}
-          fontSize={customFontSize || scene.fontSize}
-          highlightFontSize={customHighlightFontSize || scene.highlightFontSize}
-          sansFontFamily={scene.sansFontFamily}
-          scriptFontFamily={scene.scriptFontFamily}
-        />
+        <CaptionBackground style={bgStyle}>
+          <ModeATalkingCaption
+            chunks={scene.captionChunks}
+            tokens={scene.captionTokens}
+            sceneStartFrame={scene.startFrame}
+            variant={variant}
+            fontSize={customFontSize || scene.fontSize}
+            highlightFontSize={customHighlightFontSize || scene.highlightFontSize}
+            sansFontFamily={scene.sansFontFamily}
+            scriptFontFamily={scene.scriptFontFamily}
+          />
+        </CaptionBackground>
       );
     }
 
@@ -298,6 +306,7 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({ scene }) => {
         muted={true}
         cropMeasurements={scene.splitPersonCrop}
         canvasVariant={scene.canvasVariant || "warm-grid"}
+        sideFill={scene.sideFill || false}
         topGraphicContent={
           <div
             style={{
