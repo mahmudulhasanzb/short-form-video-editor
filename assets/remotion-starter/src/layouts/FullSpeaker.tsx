@@ -8,7 +8,10 @@ import { FullSpeakerProps } from "../types/layout";
  * - Speaker fills vertical 9:16 frame, centred head-and-shoulders.
  * - Dark background, microphone visible.
  * - Slow push-in scale (frame-based via interpolate).
- * - Background behind lower-third UI darkened and blurred.
+ * - Phase 3b: No fixed 46% dark gradient behind captions. Caption background is tight
+ *   around the caption text only, via CaptionBackground in SceneRenderer, default fade-blur.
+ *   darkenLowerThird is kept for backwards compatibility but defaults to false, and if set
+ *   it must not cover 46% of the frame.
  */
 export const FullSpeaker: React.FC<FullSpeakerProps> = ({
   children,
@@ -18,7 +21,7 @@ export const FullSpeaker: React.FC<FullSpeakerProps> = ({
   pushIn = true,
   pushInScale = 1.06,
   lowerThird,
-  darkenLowerThird = true,
+  darkenLowerThird = false,
 }) => {
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
@@ -70,22 +73,9 @@ export const FullSpeaker: React.FC<FullSpeakerProps> = ({
         )}
       </div>
 
-      {/* Lower-third darkened and blurred backdrop for captions & UI */}
-      {darkenLowerThird && (
-        <div
-          style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            width: "100%",
-            height: "46%",
-            background:
-              "linear-gradient(to top, rgba(11, 21, 40, 0.94) 0%, rgba(11, 21, 40, 0.75) 55%, rgba(11, 21, 40, 0) 100%)",
-            backdropFilter: "blur(4px)",
-            pointerEvents: "none",
-          }}
-        />
-      )}
+      {/* Phase 3b: No fixed 46% backdrop. CaptionBackground in SceneRenderer provides
+          a tight fade-blur around caption text only. This block is intentionally removed. */}
+      {darkenLowerThird && null}
 
       {/* Lower-third UI & Caption container (chest level, never covering eyes) */}
       {lowerThird && (
