@@ -6,7 +6,6 @@ import { SplitLayout } from "../layouts/SplitLayout";
 import { FullCanvas } from "../layouts/FullCanvas";
 import { ModeATalkingCaption } from "../captions/ModeATalkingCaption";
 import { ModeBStatementLockup } from "../captions/ModeBStatementLockup";
-import { UICardLifespan } from "../motion/UICardLifespan";
 import { GenericComposition } from "./GenericComposition";
 import { CaptionBackground } from "../captions/CaptionBackground";
 
