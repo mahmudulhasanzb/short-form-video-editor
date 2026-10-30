@@ -1,6 +1,7 @@
 import React from "react";
 import { useCurrentFrame, interpolate, spring, useVideoConfig } from "remotion";
 import { CompositionElement } from "../types/scene-plan";
+import { AnimatedDiagram, MotionGraph } from "./AnimatedDiagram";
 
 /**
  * Phase 3 draft: generic, data-driven composition renderer.
@@ -83,6 +84,24 @@ export const GenericComposition: React.FC<GenericCompositionProps> = ({
           borderRadius: 16,
         };
 
+        if (el.kind === "diagram") {
+          // Diagram elements use AnimatedDiagram, not a static box. Text is split by | into nodes.
+          const nodes = (el.text || "").split("|").map((label) => ({ label: label.trim() })).filter((n) => n.label);
+          return (
+            <div key={el.id} style={style}>
+              <AnimatedDiagram nodes={nodes} durationFrames={relEnd !== undefined ? relEnd - relStart : 90} color={el.color || "#2563EB"} />
+            </div>
+          );
+        }
+        if (el.kind === "chart") {
+          // Chart elements use MotionGraph with values from text, comma separated numbers.
+          const values = (el.text || "").split(",").map((v) => parseFloat(v.trim())).filter((v) => !isNaN(v));
+          return (
+            <div key={el.id} style={style}>
+              <MotionGraph values={values.length > 0 ? values : [30, 60, 90]} color={el.color || "#2563EB"} durationFrames={relEnd !== undefined ? relEnd - relStart : 90} />
+            </div>
+          );
+        }
         if (el.kind === "image" || el.kind === "object") {
           if (!el.src) return null;
           return (
