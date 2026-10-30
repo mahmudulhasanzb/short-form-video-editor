@@ -10,19 +10,6 @@ import { UICardLifespan } from "../motion/UICardLifespan";
 import { GenericComposition } from "./GenericComposition";
 import { CaptionBackground } from "../captions/CaptionBackground";
 
-// UI Card Components
-import { DarkGlassNumberedPill } from "../cards/DarkGlassNumberedPill";
-import { BeginnerProSlider } from "../cards/BeginnerProSlider";
-import { TiltedMockupCard } from "../cards/TiltedMockupCard";
-import { BrowserWindowMockup } from "../cards/BrowserWindowMockup";
-import { TimelineCard } from "../cards/TimelineCard";
-import { SoundWaveCard } from "../cards/SoundWaveCard";
-import { ProductLogoCard } from "../cards/ProductLogoCard";
-import { LoadingSegmentsCard } from "../cards/LoadingSegmentsCard";
-import { ColorSwatchesCard } from "../cards/ColorSwatchesCard";
-import { DashedBadgeCard } from "../cards/DashedBadgeCard";
-import { GlossyPlayCard } from "../cards/GlossyPlayCard";
-import { SoundPadMatrixCard } from "../cards/SoundPadMatrixCard";
 
 export interface SceneRendererProps {
   scene: ScenePlanItem;
@@ -84,92 +71,10 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({ scene }) => {
     return hasCard || hasElements || hasSource || hasComposition;
   };
 
-  // Render UI Card component if requested
+  // Phase 3b: old card switch removed. GenericComposition is the only visual renderer.
+  // Old card files are to be deleted after this commit, they are no longer imported here.
   const renderUICard = () => {
-    if (scene.cardVisualsEnabled === false) return null;
-    const props = (scene.uiCardProps || {}) as Record<string, unknown>;
-
-    let cardElement: React.ReactNode = null;
-
-    switch (scene.uiCardNeed) {
-      case "DarkGlassNumberedPill":
-        cardElement = (
-          <DarkGlassNumberedPill
-            steps={(props.steps as (number | string)[]) || []}
-            sceneStartFrame={scene.startFrame}
-            {...props}
-          />
-        );
-        break;
-      case "BeginnerProSlider":
-        cardElement = <BeginnerProSlider {...props} />;
-        break;
-      case "TiltedMockupCard":
-        cardElement = <TiltedMockupCard {...props} />;
-        break;
-      case "BrowserWindowMockup":
-        cardElement = <BrowserWindowMockup title="" {...props} />;
-        break;
-      case "TimelineCard":
-        cardElement = <TimelineCard {...props} />;
-        break;
-      case "SoundWaveCard":
-        cardElement = <SoundWaveCard {...props} />;
-        break;
-      case "ProductLogoCard":
-        cardElement = <ProductLogoCard title="" {...props} />;
-        break;
-      case "LoadingSegmentsCard":
-        cardElement = <LoadingSegmentsCard {...props} />;
-        break;
-      case "ColorSwatchesCard":
-        cardElement = <ColorSwatchesCard swatches={[]} {...props} />;
-        break;
-      case "DashedBadgeCard":
-        cardElement = (
-          <DashedBadgeCard
-            sceneStartFrame={scene.startFrame}
-            {...props}
-          />
-        );
-        break;
-      case "GlossyPlayCard":
-        cardElement = <GlossyPlayCard {...props} />;
-        break;
-      case "SoundPadMatrixCard":
-        cardElement = <SoundPadMatrixCard {...props} />;
-        break;
-      case "none":
-      default:
-        return null;
-    }
-
-    if (!cardElement) return null;
-
-    // Calculate relative startFrame and endFrame for UI card
-    let relCardStart = 2;
-    let relCardEnd: number | undefined = undefined;
-
-    if (scene.uiCardStartFrame !== undefined && scene.uiCardStartFrame !== null) {
-      relCardStart =
-        scene.uiCardStartFrame >= scene.startFrame
-          ? scene.uiCardStartFrame - scene.startFrame
-          : scene.uiCardStartFrame;
-    }
-
-    if (scene.uiCardEndFrame !== undefined && scene.uiCardEndFrame !== null) {
-      relCardEnd =
-        scene.uiCardEndFrame >= scene.startFrame
-          ? scene.uiCardEndFrame - scene.startFrame
-          : scene.uiCardEndFrame;
-    }
-
-    // Wrap with UICardLifespan (Apple-style entrance, topic lifespan, smooth exit)
-    return (
-      <UICardLifespan startFrame={relCardStart} endFrame={relCardEnd}>
-        {cardElement}
-      </UICardLifespan>
-    );
+    return null;
   };
 
   // Render Caption based on captionMode and background contrast variant
