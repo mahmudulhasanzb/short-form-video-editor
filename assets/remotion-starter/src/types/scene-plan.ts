@@ -74,6 +74,15 @@ export interface CameraChoice {
   direction?: "center" | "left" | "right" | "up" | "down";
 }
 
+/** Phase 3b video-level settings, one-time per video, not per scene. */
+export interface VideoPlanSettings {
+  sansFontFamily: string;
+  scriptFontFamily: string;
+  fontSize: number;
+  highlightFontSize: number;
+  captionBackgroundStyle: "fade-blur" | "none" | "dark-pill";
+}
+
 export interface PlanScreenshot {
   /** Path to a real frame extracted from cleaned.mp4, in the per-video project. */
   fileName: string;
@@ -184,6 +193,20 @@ export interface ScenePlanItem {
   animationType?: string;
   animationDirection?: string;
   animationIntensity?: number;
+
+  /* Phase 3b fields. */
+  /** Caption background style, default fade-blur. */
+  captionBackgroundStyle?: "fade-blur" | "none" | "dark-pill";
+  /** Card visuals on or off for this scene. Off clears compositionElements in preview and JSON. */
+  cardVisualsEnabled?: boolean;
+  /** Split side fill, default off. */
+  sideFill?: boolean;
+  /** Split bottom fade, default on. */
+  splitBottomFade?: boolean;
+  /** Video-level typography override for this scene only, if explicitly set. Otherwise use VideoPlanSettings. */
+  sceneFontOverride?: boolean;
+  /** True if this scene was added by Add Scene or Split Scene in the plan. */
+  addedInPlan?: boolean;
 }
 
 export interface SceneValidationResult {
@@ -288,6 +311,18 @@ export function validateScenePlanItem(scene: ScenePlanItem): SceneValidationResu
     if (hasCard && !hasElements && !hasSource && (scene.uiCardEndFrame === undefined || scene.uiCardEndFrame === null)) {
       errors.push(
         `Scene #${scene.sceneNumber}: 50/50 Split with a card but no uiCardEndFrame. Set uiCardEndFrame, or add composition elements with end frames, so the split cannot stay empty after the card ends.`
+      );
+    }
+  }
+
+  // Phase 3b Full Canvas visual rule: text-only Full Canvas is invalid.
+  if (scene.layoutType === "100% Full Canvas") {
+    const hasElements = Array.isArray(scene.compositionElements) && scene.compositionElements.length > 0;
+    const hasCard = scene.uiCardNeed !== undefined && scene.uiCardNeed !== null && scene.uiCardNeed !== "none";
+    const hasSource = Boolean(scene.sourceReference?.fileName);
+    if (!hasElements && !hasCard && !hasSource) {
+      errors.push(
+        `Scene #${scene.sceneNumber}: 100% Full Canvas has no visual or motion element, only text. Add a visual or motion element, or change this beat to Full Speaker, do not render plain text on white.`
       );
     }
   }
