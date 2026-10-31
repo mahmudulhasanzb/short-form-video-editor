@@ -274,10 +274,11 @@ Per project guidelines, no hex codes, numbers, products, or caption words were i
      - Secondary (30%): light blue `[HEX TO CONFIRM FROM STORYBOARD FRAMES]`
      - Accent (10%): bright blue `[HEX TO CONFIRM FROM STORYBOARD FRAMES]`
    - Default calibrated fallback values (`#0B1528`, `#60A5FA`, `#2563EB`) are provided in `src/theme/palette.ts`, and full prop overrides are supported.
-2. **Missing Font File (`Creato Display`)**:
-   - `visual-direction-draft.md` Section 2 claims `Creato Display` is in the `fonts` folder.
-   - The actual `fonts/` directory only contains: `bryson`, `built_titling`, `heading_now`, `instrument_serif`, `nexa`, `playfair_display`.
-   - `Creato Display` is **MISSING** from local files. The template explicitly flags this missing font by name in `src/theme/fonts.ts` and uses standard sans fallback without silent substitution.
-   - `Instrument Serif` (Italic and Regular) is confirmed present and loaded via `@remotion/fonts`.
+2. **Font Status, Corrected 2026-10-30, Phase 3**:
+   - `Creato Display` is **MISSING** from local files. Do NOT claim it is the rendered primary font.
+   - Current Primary Sans stopgap, confirmed in `src/theme/fonts.ts`: **Nexa**, ExtraLight mapped to weight 400 and Heavy mapped to weight 700. This is a weight compromise, ExtraLight may be thin at 52px, and its commercial licence is unclear, so Nexa is acceptable for private push and test only. Add a true OFL sans with genuine 400/600/700 cuts, for example Inter, before public or commercial production delivery.
+   - Secondary, confirmed present: **Instrument Serif** (Regular and Italic, OFL), loaded via `@remotion/fonts`.
+   - Other folders present but unassigned for captions: `bryson` (Personal Use Only, serif), `built_titling` (all-caps only), `heading_now` (CC BY-NC 4.0, non-commercial only, removed as Primary Sans), `playfair_display` (OFL, serif).
+   - Normal and highlighted fonts are independently selectable in the plan, see SKILL.md Section 12. The rendered font must be verified in Remotion, not assumed from this README.
 3. **Reference Video Cut Timestamps**:
    - Exact start/end timestamps for individual cuts in the original reference videos are unknown. UI internal timecodes (e.g. `00:12` in Video 1 Frame 08, `00:06:07` in Video 2 Frame 02, `00:09:08` in Frame 03, Frame 244 in Frame 07) are noted in `storyboard/Visual-Training-Storyboard.md`. New videos supply their own deterministic frame numbers.

@@ -52,6 +52,8 @@ export interface SplitLayoutProps {
   cropMeasurements?: PersonCropMeasurements;
   /** Background variant for top graphic canvas */
   canvasVariant?: CanvasBackgroundVariant;
+  /** Phase 3b: side fill for Split bottom speaker, default false. */
+  sideFill?: boolean;
 }
 
 export interface FullCanvasProps {

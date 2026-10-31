@@ -6,21 +6,9 @@ import { SplitLayout } from "../layouts/SplitLayout";
 import { FullCanvas } from "../layouts/FullCanvas";
 import { ModeATalkingCaption } from "../captions/ModeATalkingCaption";
 import { ModeBStatementLockup } from "../captions/ModeBStatementLockup";
-import { UICardLifespan } from "../motion/UICardLifespan";
+import { GenericComposition } from "./GenericComposition";
+import { CaptionBackground } from "../captions/CaptionBackground";
 
-// UI Card Components
-import { DarkGlassNumberedPill } from "../cards/DarkGlassNumberedPill";
-import { BeginnerProSlider } from "../cards/BeginnerProSlider";
-import { TiltedMockupCard } from "../cards/TiltedMockupCard";
-import { BrowserWindowMockup } from "../cards/BrowserWindowMockup";
-import { TimelineCard } from "../cards/TimelineCard";
-import { SoundWaveCard } from "../cards/SoundWaveCard";
-import { ProductLogoCard } from "../cards/ProductLogoCard";
-import { LoadingSegmentsCard } from "../cards/LoadingSegmentsCard";
-import { ColorSwatchesCard } from "../cards/ColorSwatchesCard";
-import { DashedBadgeCard } from "../cards/DashedBadgeCard";
-import { GlossyPlayCard } from "../cards/GlossyPlayCard";
-import { SoundPadMatrixCard } from "../cards/SoundPadMatrixCard";
 
 export interface SceneRendererProps {
   scene: ScenePlanItem;
@@ -57,91 +45,35 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({ scene }) => {
     );
   }
 
-  // Render UI Card component if requested
-  const renderUICard = () => {
-    const props = (scene.uiCardProps || {}) as Record<string, unknown>;
-
-    let cardElement: React.ReactNode = null;
-
-    switch (scene.uiCardNeed) {
-      case "DarkGlassNumberedPill":
-        cardElement = (
-          <DarkGlassNumberedPill
-            steps={(props.steps as (number | string)[]) || []}
-            sceneStartFrame={scene.startFrame}
-            {...props}
-          />
-        );
-        break;
-      case "BeginnerProSlider":
-        cardElement = <BeginnerProSlider {...props} />;
-        break;
-      case "TiltedMockupCard":
-        cardElement = <TiltedMockupCard {...props} />;
-        break;
-      case "BrowserWindowMockup":
-        cardElement = <BrowserWindowMockup title="" {...props} />;
-        break;
-      case "TimelineCard":
-        cardElement = <TimelineCard {...props} />;
-        break;
-      case "SoundWaveCard":
-        cardElement = <SoundWaveCard {...props} />;
-        break;
-      case "ProductLogoCard":
-        cardElement = <ProductLogoCard title="" {...props} />;
-        break;
-      case "LoadingSegmentsCard":
-        cardElement = <LoadingSegmentsCard {...props} />;
-        break;
-      case "ColorSwatchesCard":
-        cardElement = <ColorSwatchesCard swatches={[]} {...props} />;
-        break;
-      case "DashedBadgeCard":
-        cardElement = (
-          <DashedBadgeCard
-            sceneStartFrame={scene.startFrame}
-            {...props}
-          />
-        );
-        break;
-      case "GlossyPlayCard":
-        cardElement = <GlossyPlayCard {...props} />;
-        break;
-      case "SoundPadMatrixCard":
-        cardElement = <SoundPadMatrixCard {...props} />;
-        break;
-      case "none":
-      default:
-        return null;
-    }
-
-    if (!cardElement) return null;
-
-    // Calculate relative startFrame and endFrame for UI card
-    let relCardStart = 2;
-    let relCardEnd: number | undefined = undefined;
-
-    if (scene.uiCardStartFrame !== undefined && scene.uiCardStartFrame !== null) {
-      relCardStart =
-        scene.uiCardStartFrame >= scene.startFrame
-          ? scene.uiCardStartFrame - scene.startFrame
-          : scene.uiCardStartFrame;
-    }
-
-    if (scene.uiCardEndFrame !== undefined && scene.uiCardEndFrame !== null) {
-      relCardEnd =
-        scene.uiCardEndFrame >= scene.startFrame
-          ? scene.uiCardEndFrame - scene.startFrame
-          : scene.uiCardEndFrame;
-    }
-
-    // Wrap with UICardLifespan (Apple-style entrance, topic lifespan, smooth exit)
+  // Phase 3: render a generic composition if compositionElements are present.
+  // This does NOT delete old cards. If elements are present, they win over a forced card.
+  // If elements are absent, the old card switch below is the fallback.
+  const renderGenericComposition = () => {
+    // Phase 3b card toggle: off means no composition, no card, in preview and render.
+    if (scene.cardVisualsEnabled === false) return null;
+    if (!scene.compositionElements || scene.compositionElements.length === 0) return null;
     return (
-      <UICardLifespan startFrame={relCardStart} endFrame={relCardEnd}>
-        {cardElement}
-      </UICardLifespan>
+      <GenericComposition
+        elements={scene.compositionElements}
+        sceneStartFrame={scene.startFrame}
+        sansFontFamily={scene.sansFontFamily}
+        scriptFontFamily={scene.scriptFontFamily}
+      />
     );
+  };
+
+  const hasVisualArtifact = () => {
+    const hasCard = scene.uiCardNeed !== undefined && scene.uiCardNeed !== null && scene.uiCardNeed !== "none";
+    const hasElements = Array.isArray(scene.compositionElements) && scene.compositionElements.length > 0;
+    const hasSource = Boolean(scene.sourceReference?.fileName);
+    const hasComposition = scene.compositionType !== undefined && scene.compositionType !== null && scene.compositionType !== "none";
+    return hasCard || hasElements || hasSource || hasComposition;
+  };
+
+  // Phase 3b: old card switch removed. GenericComposition is the only visual renderer.
+  // Old card files are to be deleted after this commit, they are no longer imported here.
+  const renderUICard = () => {
+    return null;
   };
 
   // Render Caption based on captionMode and background contrast variant
@@ -150,16 +82,22 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({ scene }) => {
     customFontSize?: number,
     customHighlightFontSize?: number
   ) => {
+    // Phase 3b: caption background is tight fade-blur by default, not a full-width box.
+    const bgStyle = scene.captionBackgroundStyle || "fade-blur";
     if (scene.captionMode === "Mode A") {
       return (
-        <ModeATalkingCaption
-          chunks={scene.captionChunks}
-          tokens={scene.captionTokens}
-          sceneStartFrame={scene.startFrame}
-          variant={variant}
-          fontSize={customFontSize || scene.fontSize}
-          highlightFontSize={customHighlightFontSize || scene.highlightFontSize}
-        />
+        <CaptionBackground style={bgStyle}>
+          <ModeATalkingCaption
+            chunks={scene.captionChunks}
+            tokens={scene.captionTokens}
+            sceneStartFrame={scene.startFrame}
+            variant={variant}
+            fontSize={customFontSize || scene.fontSize}
+            highlightFontSize={customHighlightFontSize || scene.highlightFontSize}
+            sansFontFamily={scene.sansFontFamily}
+            scriptFontFamily={scene.scriptFontFamily}
+          />
+        </CaptionBackground>
       );
     }
 
@@ -170,6 +108,8 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({ scene }) => {
           title={title}
           fontSize={customFontSize || scene.fontSize}
           highlightFontSize={customHighlightFontSize || scene.highlightFontSize}
+          sansFontFamily={scene.sansFontFamily}
+          scriptFontFamily={scene.scriptFontFamily}
         />
       );
     }
@@ -219,6 +159,33 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({ scene }) => {
           : scene.uiCardEndFrame;
     }
 
+    // Phase 3 blank-split fix: if composition elements exist, use their latest end frame as the visual end.
+    if (scene.compositionElements && scene.compositionElements.length > 0) {
+      const ends = scene.compositionElements
+        .map((el) => (el.endFrame !== undefined && el.endFrame !== null ? (el.endFrame >= scene.startFrame ? el.endFrame - scene.startFrame : el.endFrame) : undefined))
+        .filter((v): v is number => v !== undefined);
+      if (ends.length > 0) {
+        relCardEnd = Math.max(...ends);
+      }
+    }
+
+    // Phase 3 blank-split fix, part 1: no visual artifact at all, never enter Split.
+    // This also covers the old bug where a Split with no card end frame and no source could enter Split with an empty top.
+    if (!hasVisualArtifact()) {
+      return (
+        <FullSpeaker
+          speakerSrc={effectiveSpeakerSrc}
+          startFrom={scene.startFrame}
+          muted={true}
+          lowerThird={
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 20 }}>
+              {renderCaption("dark-bg", 52, 84)}
+            </div>
+          }
+        />
+      );
+    }
+
     // Dynamic runtime guard: if the card has finished its topic and exited, and no sourceReference
     // is present, dynamically return to Full Speaker with white text so the canvas is NEVER left blank!
     if (!hasSource && relCardEnd !== undefined && frame >= relCardEnd) {
@@ -243,6 +210,7 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({ scene }) => {
         muted={true}
         cropMeasurements={scene.splitPersonCrop}
         canvasVariant={scene.canvasVariant || "warm-grid"}
+        sideFill={scene.sideFill || false}
         topGraphicContent={
           <div
             style={{
@@ -255,8 +223,8 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({ scene }) => {
               paddingBottom: 24,
             }}
           >
-            <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              {renderUICard()}
+            <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", width: "100%" }}>
+              {renderGenericComposition() || renderUICard()}
             </div>
             {renderCaption("light-bg")}
           </div>
@@ -271,8 +239,8 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({ scene }) => {
       variant={scene.canvasVariant || "warm-grid"}
       statementLockup={scene.captionMode === "Mode B" ? renderCaption("light-bg") : undefined}
     >
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 32 }}>
-        {renderUICard()}
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 32, width: "100%" }}>
+        {renderGenericComposition() || renderUICard()}
         {scene.captionMode === "Mode A" && renderCaption("light-bg")}
       </div>
     </FullCanvas>
