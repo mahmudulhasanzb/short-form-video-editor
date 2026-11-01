@@ -77,7 +77,7 @@ See [visual-direction.md](references/visual-direction.md) for deep aesthetic spe
   - Sans Role: `Nexa` (replaces missing `Creato Display`; weight compromise: ExtraLight for regular, Heavy for bold). Files in `assets/fonts/nexa/`.
   - Script / Highlight Role: `Instrument Serif`, weight 400 italic. Files in `assets/fonts/instrument_serif/`.
   - Default Sizes: Full Speaker normal 52px, highlighted 84px. Split normal 48px, highlighted 80px. Full Canvas Mode B normal 52px, highlighted 84px. Step back 5% if frame check fails and report.
-- **Color & Contrast**: Dark text on light canvas; pure white text on dark speaker background. Highlights use subtle same-family gradients (lighter to deeper blue) with low-opacity soft glow. Never flat solid highlights, never white glow, never multi-color.
+- **Color & Contrast**: Dark text on light canvas; pure white text on dark speaker background. Highlights use subtle same-family gradients (lighter to deeper blue ) with low-opacity soft glow. Never flat solid highlights, never white glow, never multi-color.
 
 ## 7. Layout and Crop Procedure
 - **Layout Modes**: `Full Speaker` (speaker with lower-third caption/card), `50/50 Split` (top graphic canvas + bottom speaker Layer B), `100% Full Canvas` (warm off-white background with subtle grid).
