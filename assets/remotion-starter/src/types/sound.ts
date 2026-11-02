@@ -18,6 +18,12 @@ export interface SoundCue {
   leadFrames?: number;
   /** Optional description/notes */
   notes?: string;
+  /** Phase 3: purpose linked to the visual event, shown in the plan. */
+  purpose?: string;
+  /** Phase 3: alternative filenames that fit the same event, for plan selection. */
+  alternatives?: string[];
+  /** Phase 3: true if the user explicitly selected this cue in the plan editor. */
+  userSelected?: boolean;
 }
 
 export interface SoundTrackProps {

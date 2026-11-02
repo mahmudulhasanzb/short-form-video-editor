@@ -8,20 +8,11 @@ export { PersonCropHelper } from "./layouts/PersonCrop";
 export { ModeATalkingCaption } from "./captions/ModeATalkingCaption";
 export { ModeBStatementLockup } from "./captions/ModeBStatementLockup";
 export { HighlightScriptWord } from "./captions/HighlightScriptWord";
+export { CaptionBackground } from "./captions/CaptionBackground";
 
-// UI Card Components
-export { DarkGlassNumberedPill } from "./cards/DarkGlassNumberedPill";
-export { BeginnerProSlider } from "./cards/BeginnerProSlider";
-export { TiltedMockupCard } from "./cards/TiltedMockupCard";
-export { BrowserWindowMockup } from "./cards/BrowserWindowMockup";
-export { TimelineCard } from "./cards/TimelineCard";
-export { SoundWaveCard } from "./cards/SoundWaveCard";
-export { ProductLogoCard } from "./cards/ProductLogoCard";
-export { LoadingSegmentsCard } from "./cards/LoadingSegmentsCard";
-export { ColorSwatchesCard } from "./cards/ColorSwatchesCard";
-export { DashedBadgeCard } from "./cards/DashedBadgeCard";
-export { GlossyPlayCard } from "./cards/GlossyPlayCard";
-export { SoundPadMatrixCard } from "./cards/SoundPadMatrixCard";
+// Generic Composition Components, Phase 3b, old cards deleted
+export { GenericComposition } from "./composition/GenericComposition";
+export { AnimatedDiagram, MotionGraph } from "./composition/AnimatedDiagram";
 
 // Motion Components (All Frame-Based!)
 export { PopIn } from "./motion/PopIn";

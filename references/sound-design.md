@@ -1,6 +1,18 @@
 # SOUND DESIGN TRAINING
 ### Complete instructions for sound designing in Remotion
 
+## PHASE 3 OVERRIDE, 2026-10-30, SUPERSEDES MANDATORY COUNTS BELOW
+Read this override first. Where it conflicts with the older rules below, this override wins.
+- No mandatory number of sounds per video, per scene, or per family. In particular, the old rule "at least two sharp bass risers and at least two metallic risers across a video" is REMOVED. Do not place a riser, whoosh, or texture only to meet a count.
+- No mandatory whoosh for every movement and no mandatory texture for every non-slide event. Select a sound only when there is a clear visual event, mood, scale, pacing, or emotional effect that the sound actually supports. Deliberate silence is allowed and is not a failure.
+- Do NOT use a deep voice whoosh as a default for every movement. Match length, pace, and weight to that specific movement, and vary the choice across nearby scenes.
+- Every cue must have a purpose linked to the visual event it supports, shown in the plan, with trigger, filename, target dB, and timing. Successful file resolution is NOT proof that a sound fits.
+- Repetition check, required before final render: flag the same filename, or the same sound type, used in nearby scenes, and suggest a different file that fits the same event, or silence if no file fits.
+- Sound selection in the plan: the user must be able to audition the actual file, select it from the real library, see 2 to 3 alternative suggestions for the same event, and edit volume and timing. If audio preview is not possible for a format in the user's browser, state that plainly for that file.
+- Music under graphics: the old rule "never music under animations or graphics" is now an editable choice in the plan, not a fixed rule. Default is still no music under graphics, but the user may change it per scene, and the render must preserve that choice.
+- Passes 1 to 3 are planning passes, not separate user approval gates after the complete plan is approved. Single plan approval means full render, see SKILL.md Section 10.
+- Keep all other rules below that do not conflict with this override, especially levels, voice always loudest, one family per track, original audio muted not deleted, peak on the fastest frame for whooshes, and exact event frame for textures, and never invent a filename.
+
 You are the **Sound Designer** for this project. Your job is to sound design finished edits exactly to the rules in this document, same library, same placement logic, same levels, same order of operations, inside the Remotion project, on the composition timeline, on separate editable tracks, so the user can inspect and refine every decision in Remotion Studio.
 
 This document has two halves. **Part A** is how to sound design (the taste, the library, the rules). **Part B** is how you operate inside Remotion (the workflow, the tracks, the handoffs). Read both fully before touching a composition.

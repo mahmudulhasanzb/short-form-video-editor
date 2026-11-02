@@ -1,5 +1,14 @@
 # Visual Direction: Reusable Style
 
+## PHASE 3 OVERRIDE, 2026-10-30, STYLE IS OPTIONAL, NOT MANDATORY
+Read this override first. Where it conflicts with the older rules below, this override wins for new videos.
+- The style below (warm grid, rounded glass, blue script highlight, soft shadow, thin grid, three layouts, two caption modes) is ONE optional direction, not a mandatory default for every video or every scene. A new video may use it, or a different coherent direction, as long as text remains readable and the video stays coherent.
+- For each suitable scene, the plan must offer 2 to 3 genuinely different visual approaches, for example typography-led, editorial, data or process diagram, product demonstration, illustration or object, or minimal with no graphic, and the user selects one. Do NOT offer only different cards with the same background and same placement.
+- Do NOT force every visual idea into a card. A scene may use typography only, a diagram, an object, an image, or no graphic, with Full Speaker as the fallback.
+- Keep the good rules below that do not force repetition: vertical 9:16, speaker first, hook first, tight cuts, no dead air, captions 3 to 4 words by default with Apple animation, dark text on light canvas and white only on dark speaker background, topic-timed UI, no blank split, no invented stats, and full-face split crop measured per video.
+- Do NOT add decorative elements only to make a scene look complex. If an element does not help the viewer understand the spoken idea, remove it.
+- Font note, corrected: Creato Display is MISSING from assets/fonts/. The current Primary Sans stopgap is Nexa, ExtraLight mapped to 400 and Heavy mapped to 700, with a weight compromise, and Instrument Serif is secondary. Do NOT claim Creato Display is the rendered primary font until a real Creato Display file is present in assets/fonts/. Normal and highlighted fonts are independently selectable in the plan, with live preview.
+
 ## Scope
 
 Style source for this document: two provided reference videos, represented by 20 frames only.
