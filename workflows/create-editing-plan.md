@@ -7,14 +7,14 @@ Create an editable, validated scene plan and open it in the interactive editor. 
 1. Confirm the cleaned video and transcript exist and passed verification.
 2. Analyze transcript, speaker footage, and any supplied visual assets using [analyze-video.md](analyze-video.md). For supplied video files, create and inspect timestamped contact sheets before selecting excerpts.
 3. Build scene and beat data with transcript evidence, exact project frame ranges, justified layouts, visual direction, caption timing, camera motion, and sound cues.
-4. Place relevant supplied footage using its asset ID. Set `mediaStartFrame`/`mediaEndFrame` to source-video frames, and `timelineStartFrame`/`timelineEndFrame` to the display window relative to the scene (project FPS). Source trim selects the excerpt; timeline range controls when it appears. Keep it concise and transcript-relevant.
-5. Create two or three genuinely distinct visual alternatives only when a graphic is useful and the content supports it. Do not manufacture alternatives just to meet a count.
-6. Compare each scene with its neighbors. Remove repeated card/layout patterns unless repetition communicates a deliberate progression or comparison.
-7. Validate source trims and scene-relative overlay windows. Reject windows outside the scene, missing evidence, unresolved alternatives, and missing asset references.
-8. Save the validated `scene-plan.json` in the video's planning directory.
-9. Open the interactive editor using that exact plan.
-10. Wait for the user to review and edit the plan. Persist edits back to the same source-of-truth plan.
-11. Stop. Final rendering belongs to the approved render workflow.
+4. Place relevant supplied footage only after reviewing its timestamped contact sheet and scrubbing the original clip. Match visible action to the transcript's meaning, not merely matching keywords. If no clip genuinely supports a beat, do not force one.\n5. For every accepted footage match, keep an evidence note during planning: transcript quote/time, asset ID, observed action, sample timestamp(s), verified source in/out, intended display window, and confidence/uncertainty. Use the asset's FPS for source frames and project FPS for timeline frames.\n6. Set `mediaStartFrame`/`mediaEndFrame` to source-video frames, and `timelineStartFrame`/`timelineEndFrame` to the display window relative to the scene. Source trim selects the excerpt; timeline range controls when it appears. Keep it concise and transcript-relevant.
+7. Create two or three genuinely distinct visual alternatives only when a graphic is useful and the content supports it. Do not manufacture alternatives just to meet a count.
+8. Compare each scene with its neighbors. Remove repeated card/layout patterns unless repetition communicates a deliberate progression or comparison.
+9. Validate source trims and scene-relative overlay windows. Reject windows outside the scene, missing evidence, unresolved alternatives, and missing asset references.
+10. Save the validated `scene-plan.json` in the video's planning directory.
+11. Open the interactive editor using that exact plan.
+12. Wait for the user to review and edit the plan. Persist edits back to the same source-of-truth plan.
+13. Stop. Final rendering belongs to the approved render workflow.
 
 ## Visual selection rules
 - Start with the idea, not the component library. Speaker-only is a valid and preferred choice when no supporting visual adds meaning.

@@ -15,7 +15,7 @@ For every supplied video asset, make a timestamped visual inventory before propo
 1. Run `python scripts/inspect_footage.py <video-path> --output <workspace>/footage-inspection/<asset-id>` (requires ffmpeg and ffprobe).
 2. Open the generated `contact-sheet.jpg` and inspect the corresponding samples. Read `footage.json` for exact sample timestamps, duration, dimensions, and frame rate.
 3. If the sheet suggests a useful moment, scrub the original clip around that timestamp to verify the action and exact source in/out boundaries. A contact sheet is for discovery, not frame-accurate trimming.
-4. Record what is actually visible, the strongest usable time range, and any uncertainty. Do not infer unseen content from a filename.
+4. Record what is actually visible, the strongest usable time range, and any uncertainty. Do not infer unseen content from a filename.\n5. Treat each inspected clip as a set of candidate moments. A timestamp is a lead, not proof of the action between samples; inspect the original footage before choosing the exact trim.\n6. Keep the asset ID tied to its manifest. Never mix timestamps from one clip with another clip's frame rate or duration.
 
 ## Process
 1. Confirm that the cleaned video passed verification.
