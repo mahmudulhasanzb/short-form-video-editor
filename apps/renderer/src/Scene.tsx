@@ -74,7 +74,7 @@ export const Scene: React.FC<{
       {!fullCanvas && <SpeakerVideo src={sourceVideo} scene={scene} split={split} />}
       {scene.visual.type !== "none" && (
         <AbsoluteFill style={split ? { height: "50%", overflow: "hidden" } : undefined}>
-          <VisualLayer alternative={selected} assets={input.assets} />
+          <VisualLayer alternative={selected} assets={input.assets} sceneDurationFrames={scene.endFrame - scene.startFrame} />
         </AbsoluteFill>
       )}
       <CaptionLayer scene={scene} />

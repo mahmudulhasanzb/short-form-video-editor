@@ -34,6 +34,9 @@ export const visualElementSchema = z
     /** Optional source-media trim in frames. Used by video elements only. */
     mediaStartFrame: frame.optional(),
     mediaEndFrame: frame.optional(),
+    /** Scene-relative display window for video overlays. */
+    timelineStartFrame: frame.optional(),
+    timelineEndFrame: frame.optional(),
     style: z.record(z.unknown()).default({}),
   })
   .strict()
@@ -78,9 +81,12 @@ export const visualElementSchema = z
           message: "Video mediaEndFrame must be greater than mediaStartFrame.",
         });
       }
+      if (element.timelineStartFrame !== undefined && element.timelineEndFrame !== undefined && element.timelineEndFrame <= element.timelineStartFrame) {
+        context.addIssue({ code: z.ZodIssueCode.custom, path: ["timelineEndFrame"], message: "Video timelineEndFrame must be greater than timelineStartFrame." });
+      }
     } else if (
-      element.mediaStartFrame !== undefined ||
-      element.mediaEndFrame !== undefined
+      element.mediaStartFrame !== undefined || element.mediaEndFrame !== undefined ||
+      element.timelineStartFrame !== undefined || element.timelineEndFrame !== undefined
     ) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
@@ -241,6 +247,17 @@ export const sceneSchema = z
         path: ["visual", "selectedAlternativeId"],
         message: "A no-graphic scene cannot select a visual alternative.",
       });
+    }
+
+    for (const alternative of scene.visual.alternatives) {
+      for (const element of alternative.elements) {
+        if (element.kind !== "video") continue;
+        const start = element.timelineStartFrame ?? 0;
+        const end = element.timelineEndFrame ?? scene.endFrame - scene.startFrame;
+        if (end > scene.endFrame - scene.startFrame || start >= end) {
+          context.addIssue({ code: z.ZodIssueCode.custom, path: ["visual", "alternatives", alternative.id, "elements", element.id], message: "Video overlay timeline range must be positive and remain inside its scene." });
+        }
+      }
     }
 
     for (const [index, chunk] of scene.captions.chunks.entries()) {

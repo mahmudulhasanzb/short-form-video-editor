@@ -162,6 +162,8 @@ describe("scenePlanSchema", () => {
                     zIndex: 1,
                     mediaStartFrame: 45,
                     mediaEndFrame: 135,
+                    timelineStartFrame: 20,
+                    timelineEndFrame: 110,
                     style: { objectFit: "cover" },
                   },
                 ],

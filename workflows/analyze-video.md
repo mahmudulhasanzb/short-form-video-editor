@@ -26,7 +26,7 @@ For every supplied video asset, make a timestamped visual inventory before propo
 6. Choose the simplest visual form that communicates that idea: speaker-only, restrained typography, comparison, process diagram, timeline, relevant supplied image/object, genuine product/UI demonstration, or another justified composition.
 7. Choose Full Speaker, 50/50 Split, or Full Canvas only after the visual idea is clear.
 8. Compare supplied images/footage against transcript beats. Recommend placement only when the visible content is relevant; record the transcript evidence and intended screen treatment.
-9. For supplied footage, record source-media in/out in source frames, separately from project-timeline frames. Prefer a short, specific excerpt over placing an entire long clip. Do not stretch a short source excerpt to fill a scene; if timing is uncertain, leave it untrimmed and flag it for review.
+9. Record source-media in/out in source frames separately from scene-relative overlay start/end frames. Source trim selects the excerpt; overlay timing determines when it appears. Verify exact boundaries by scrubbing. Never fill time with unrelated footage.
 10. Record uncertainty and missing source material explicitly. Do not invent facts, metrics, product interfaces, brands, or external assets.
 
 ## Anti-template visual direction

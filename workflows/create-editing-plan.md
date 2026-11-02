@@ -7,10 +7,10 @@ Create an editable, validated scene plan and open it in the interactive editor. 
 1. Confirm the cleaned video and transcript exist and passed verification.
 2. Analyze transcript, speaker footage, and any supplied visual assets using [analyze-video.md](analyze-video.md). For supplied video files, create and inspect timestamped contact sheets before selecting excerpts.
 3. Build scene and beat data with transcript evidence, exact project frame ranges, justified layouts, visual direction, caption timing, camera motion, and sound cues.
-4. When a supplied clip fits a transcript beat, place a video visual element using that asset's ID. Set `mediaStartFrame` and `mediaEndFrame` to the verified source-media range (source FPS), not the scene's project-timeline range. Keep the excerpt concise and relevant; don't fill time with unrelated footage.
+4. Place relevant supplied footage using its asset ID. Set `mediaStartFrame`/`mediaEndFrame` to source-video frames, and `timelineStartFrame`/`timelineEndFrame` to the display window relative to the scene (project FPS). Source trim selects the excerpt; timeline range controls when it appears. Keep it concise and transcript-relevant.
 5. Create two or three genuinely distinct visual alternatives only when a graphic is useful and the content supports it. Do not manufacture alternatives just to meet a count.
 6. Compare each scene with its neighbors. Remove repeated card/layout patterns unless repetition communicates a deliberate progression or comparison.
-7. Validate the plan against the shared contract. Reject invalid ranges, missing evidence, unresolved selected alternatives, and missing asset references.
+7. Validate source trims and scene-relative overlay windows. Reject windows outside the scene, missing evidence, unresolved alternatives, and missing asset references.
 8. Save the validated `scene-plan.json` in the video's planning directory.
 9. Open the interactive editor using that exact plan.
 10. Wait for the user to review and edit the plan. Persist edits back to the same source-of-truth plan.

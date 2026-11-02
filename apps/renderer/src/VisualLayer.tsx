@@ -1,5 +1,5 @@
 import React from "react";
-import { AbsoluteFill, Img, Video } from "remotion";
+import { AbsoluteFill, Img, Sequence, Video } from "remotion";
 import type { ScenePlan } from "@sfe/contracts";
 import { requireAsset } from "./types";
 
@@ -8,7 +8,8 @@ type Alternative = ScenePlan["scenes"][number]["visual"]["alternatives"][number]
 export const VisualLayer: React.FC<{
   alternative: Alternative | undefined;
   assets: Record<string, string>;
-}> = ({ alternative, assets }) => {
+  sceneDurationFrames: number;
+}> = ({ alternative, assets, sceneDurationFrames }) => {
   if (!alternative) return null;
 
   return (
@@ -39,15 +40,11 @@ export const VisualLayer: React.FC<{
         }
 
         if (element.kind === "video") {
-          return (
-            <Video
-              key={element.id}
-              src={requireAsset(assets, element.assetId!, `video visual element "${element.id}"`)}
-              startFrom={element.mediaStartFrame ?? 0}
-              endAt={element.mediaEndFrame}
-              style={{ ...base, objectFit: "cover" }}
-            />
-          );
+          const from = element.timelineStartFrame ?? 0;
+          const end = element.timelineEndFrame ?? sceneDurationFrames;
+          return <Sequence key={element.id} from={from} durationInFrames={end - from} layout="none">
+            <Video src={requireAsset(assets, element.assetId!, `video visual element "${element.id}"`)} startFrom={element.mediaStartFrame ?? 0} endAt={element.mediaEndFrame} style={{ ...base, objectFit: "cover" }} />
+          </Sequence>;
         }
 
         if (element.kind === "line") {

@@ -418,7 +418,9 @@ export default function App() {
                               }}
                             />
                           </label>
-                          <small>Clear SOURCE OUT to use the source video's remaining duration. Make sure the selected file is long enough.</small>
+                          <label className="field-label">OVERLAY START (SCENE FRAME)<input type="number" min={0} max={selectedScene.endFrame - selectedScene.startFrame - 1} value={element.timelineStartFrame ?? 0} onChange={(event) => { const max = Math.max(0, selectedScene.endFrame - selectedScene.startFrame - 1); const value = Math.max(0, Math.min(max, Math.floor(Number(event.target.value) || 0))); const end = element.timelineEndFrame; updateVisualElement(selectedScene.id, selectedAlternative.id, element.id, { timelineStartFrame: end !== undefined && value >= end ? Math.max(0, end - 1) : value }); }} /></label>
+                          <label className="field-label">OVERLAY END (SCENE FRAME)<input type="number" min={(element.timelineStartFrame ?? 0) + 1} max={selectedScene.endFrame - selectedScene.startFrame} value={element.timelineEndFrame ?? selectedScene.endFrame - selectedScene.startFrame} onChange={(event) => { const max = selectedScene.endFrame - selectedScene.startFrame; const value = Math.max((element.timelineStartFrame ?? 0) + 1, Math.min(max, Math.floor(Number(event.target.value) || 1))); updateVisualElement(selectedScene.id, selectedAlternative.id, element.id, { timelineEndFrame: value }); }} /></label>
+                          <small>Overlay timing is scene-relative; source IN/OUT chooses which footage plays.</small>
                         </div>
                       ))}
                     </>
