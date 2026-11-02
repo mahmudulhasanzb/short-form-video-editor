@@ -1,5 +1,5 @@
-import React from "react";
-import { Player } from "@remotion/player";
+import React, { useEffect, useRef } from "react";
+import { Player, type CallbackListener, type PlayerRef } from "@remotion/player";
 import type { ScenePlan } from "@sfe/contracts";
 import { VideoComposition } from "../../renderer/src/VideoComposition";
 import type { RenderInputProps } from "../../renderer/src/types";
@@ -10,8 +10,25 @@ export function PlanPreview({ plan, assets, frame, onFrameChange }: {
   frame: number;
   onFrameChange: (frame: number) => void;
 }) {
+  const playerRef = useRef<PlayerRef>(null);
   const inputProps: RenderInputProps = { plan, assets };
+
+  useEffect(() => {
+    const player = playerRef.current;
+    if (!player) return;
+
+    const onUpdate: CallbackListener<"frameupdate"> = (e) => {
+      onFrameChange(e.detail.frame);
+    };
+
+    player.addEventListener("frameupdate", onUpdate);
+    return () => {
+      player.removeEventListener("frameupdate", onUpdate);
+    };
+  }, [onFrameChange]);
+
   return <Player
+    ref={playerRef}
     component={VideoComposition}
     inputProps={inputProps}
     durationInFrames={plan.project.durationFrames}
@@ -23,6 +40,5 @@ export function PlanPreview({ plan, assets, frame, onFrameChange }: {
     clickToPlay
     style={{ width: "100%", height: "100%" }}
     acknowledgeRemotionLicense
-    onFrameUpdate={onFrameChange}
   />;
 }
