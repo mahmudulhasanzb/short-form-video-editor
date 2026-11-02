@@ -9,6 +9,7 @@ import {
   Film,
   FolderOpen,
   Layers3,
+  Pause,
   Play,
   Plus,
   Settings2,
@@ -16,6 +17,7 @@ import {
   WandSparkles,
 } from "lucide-react";
 import { scenePlanSchema, type ScenePlan } from "@sfe/contracts";
+import type { PlayerRef } from "@remotion/player";
 import { PlanPreview } from "./PlanPreview";
 import { CaptionInspector } from "./CaptionInspector";
 import { SoundInspector } from "./SoundInspector";
@@ -32,6 +34,8 @@ export default function App() {
   const [selectedSceneId, setSelectedSceneId] = useState<string | null>(null);
   const [notice, setNotice] = useState<Notice | null>(null);
   const [frame, setFrame] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const playerRef = useRef<PlayerRef>(null);
   const [assetFiles, setAssetFiles] = useState<Record<string, File>>({});
   const [assetUrls, setAssetUrls] = useState<Record<string, string>>({});
   const videoInput = useRef<HTMLInputElement>(null);
@@ -217,7 +221,7 @@ export default function App() {
                 <div className="panel-heading"><span>LIVE PREVIEW</span><span className="preview-badge">PLAN PREVIEW</span></div>
                 <div className="preview-stage">
                   <div className="preview-frame" style={{ aspectRatio: `${plan.project.width} / ${plan.project.height}` }}>
-                    <PlanPreview plan={plan} assets={assetUrls} frame={frame} onFrameChange={setFrame} />
+                    <PlanPreview plan={plan} assets={assetUrls} frame={frame} onFrameChange={setFrame} playerRef={playerRef} onPlaybackStateChange={setIsPlaying} />
                   </div>
                 </div>
                 <div className="preview-asset-bar">
@@ -225,7 +229,7 @@ export default function App() {
                   <button className="small-button" onClick={() => videoInput.current?.click()}>{assetUrls[plan.source.videoAssetId] ? "Replace source video" : "Attach source video"}</button>
                   <span>{assetUrls[plan.source.videoAssetId] ? "Source attached for this tab" : "Attach source to preview footage"}</span>
                 </div>
-                <div className="preview-controls"><button className="icon-button" aria-label="Preview"><Play size={15} /></button><span>{formatTime(frame, plan.project.fps)}</span><span className="control-divider" /><span>{selectedScene ? formatTime(selectedScene.endFrame, plan.project.fps) : "—"}</span><span className="control-spacer" /><span>Shared Remotion preview · frame {frame}</span></div>
+                <div className="preview-controls"><button className="icon-button" onClick={(event) => playerRef.current?.toggle(event)} aria-label={isPlaying ? "Pause preview" : "Play preview"} title={isPlaying ? "Pause" : "Play"}>{isPlaying ? <Pause size={15} /> : <Play size={15} />}</button><span>{formatTime(frame, plan.project.fps)}</span><span className="control-divider" /><span>{selectedScene ? formatTime(selectedScene.endFrame, plan.project.fps) : "—"}</span><span className="control-spacer" /><span>Shared Remotion preview · frame {frame}</span></div>
               </div>
 
               <div className="timeline-panel panel">
