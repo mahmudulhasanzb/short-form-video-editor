@@ -379,6 +379,70 @@ export default function App() {
                     </div>
                   ) : <p className="helper-text">No alternatives are defined for this scene. The planner must create real compositions before they can be selected.</p>}
 
+                  {selectedAlternative?.elements.length ? (
+                    <>
+                      <div className="section-divider" />
+                      <div className="field-label">ELEMENT TRANSFORM</div>
+                      {selectedAlternative.elements.map((element) => {
+                        const updateNumber = (
+                          key: "x" | "y" | "width" | "height" | "rotation" | "opacity",
+                          raw: string,
+                        ) => {
+                          if (raw.trim() === "") return;
+                          const value = Number(raw);
+                          if (!Number.isFinite(value)) return;
+                          const limits = {
+                            x: { min: 0, max: 100 - element.width },
+                            y: { min: 0, max: 100 - element.height },
+                            width: { min: 0.1, max: 100 - element.x },
+                            height: { min: 0.1, max: 100 - element.y },
+                            rotation: { min: -360, max: 360 },
+                            opacity: { min: 0, max: 1 },
+                          }[key];
+                          const next = Math.max(limits.min, Math.min(limits.max, value));
+                          updateVisualElement(selectedScene.id, selectedAlternative.id, element.id, { [key]: next });
+                        };
+                        const style = (element.style ?? {}) as Record<string, unknown>;
+                        return (
+                          <div className="alternative-card" key={element.id}>
+                            <strong>{element.id} · {element.kind.toUpperCase()}</strong>
+                            <div className="field-grid">
+                              {(["x", "y", "width", "height"] as const).map((key) => (
+                                <label className="field-label" key={key}>{key.toUpperCase()} (%)
+                                  <input
+                                    type="number"
+                                    min={key === "width" || key === "height" ? 0.1 : 0}
+                                    max={key === "x" ? 100 - element.width : key === "y" ? 100 - element.height : key === "width" ? 100 - element.x : 100 - element.y}
+                                    step={0.5}
+                                    value={element[key]}
+                                    onChange={(event) => updateNumber(key, event.target.value)}
+                                  />
+                                </label>
+                              ))}
+                            </div>
+                            <div className="field-grid">
+                              <label className="field-label">ROTATION (°)
+                                <input type="number" min={-360} max={360} step={1} value={element.rotation ?? 0} onChange={(event) => updateNumber("rotation", event.target.value)} />
+                              </label>
+                              <label className="field-label">OPACITY
+                                <input type="number" min={0} max={1} step={0.05} value={element.opacity ?? 1} onChange={(event) => updateNumber("opacity", event.target.value)} />
+                              </label>
+                            </div>
+                            {element.kind === "shape" && (
+                              <label className="field-label">FILL COLOR
+                                <input
+                                  type="color"
+                                  value={/^#[0-9a-fA-F]{6}$/.test(String(style.background ?? "#a58cf0")) ? String(style.background ?? "#a58cf0") : "#a58cf0"}
+                                  onChange={(event) => updateVisualElement(selectedScene.id, selectedAlternative.id, element.id, { style: { ...style, background: event.target.value } })}
+                                />
+                              </label>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </>
+                  ) : null}
+
                   {selectedAlternative?.elements.some((element) => element.kind === "text") && (
                     <>
                       <div className="section-divider" />
