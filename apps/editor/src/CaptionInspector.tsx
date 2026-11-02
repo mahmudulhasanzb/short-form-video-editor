@@ -14,6 +14,12 @@ export function CaptionInspector({ scene, fps, onChange }: {
     ...captions,
     chunks: captions.chunks.map((chunk) => chunk.id === id ? { ...chunk, ...patch } : chunk),
   });
+  const updateChunkTiming = (chunk: Chunk, field: "startFrame" | "endFrame", value: number) => {
+    const nextValue = field === "startFrame"
+      ? Math.max(scene.startFrame, Math.min(chunk.endFrame - 1, value))
+      : Math.max(chunk.startFrame + 1, Math.min(scene.endFrame, value));
+    patchChunk(chunk.id, { [field]: nextValue });
+  };
   const patchWord = (chunkId: string, wordId: string, patch: Partial<Chunk["words"][number]>) => onChange({
     ...captions,
     chunks: captions.chunks.map((chunk) => chunk.id === chunkId
@@ -46,8 +52,8 @@ export function CaptionInspector({ scene, fps, onChange }: {
     <div className="caption-chunk-list">{captions.chunks.map((chunk, index) => <article className="caption-chunk" key={chunk.id}>
       <div className="chunk-heading"><strong>Chunk {index + 1}</strong><span>{(chunk.startFrame / fps).toFixed(2)}s – {(chunk.endFrame / fps).toFixed(2)}s</span></div>
       <div className="chunk-timing">
-        <label>START<input type="number" min={scene.startFrame} max={chunk.endFrame - 1} value={chunk.startFrame} onChange={(e) => patchChunk(chunk.id, { startFrame: Number(e.target.value) })}/></label>
-        <label>END<input type="number" min={chunk.startFrame + 1} max={scene.endFrame} value={chunk.endFrame} onChange={(e) => patchChunk(chunk.id, { endFrame: Number(e.target.value) })}/></label>
+        <label>START<input type="number" min={scene.startFrame} max={chunk.endFrame - 1} value={chunk.startFrame} onChange={(e) => updateChunkTiming(chunk, "startFrame", Number(e.target.value))}/></label>
+        <label>END<input type="number" min={chunk.startFrame + 1} max={scene.endFrame} value={chunk.endFrame} onChange={(e) => updateChunkTiming(chunk, "endFrame", Number(e.target.value))}/></label>
       </div>
       {chunk.words.map((word, wi) => <div className="caption-word-row" key={word.id}>
         <input aria-label={"Caption word " + (wi + 1)} value={word.text} onChange={(e) => patchWord(chunk.id, word.id, { text: e.target.value })}/>
