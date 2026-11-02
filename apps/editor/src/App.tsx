@@ -222,7 +222,7 @@ export default function App() {
                       key={scene.id}
                       className={`timeline-scene ${scene.id === selectedSceneId ? "selected" : ""}`}
                       style={{ left: `${(scene.startFrame / plan.project.durationFrames) * 100}%`, width: `${((scene.endFrame - scene.startFrame) / plan.project.durationFrames) * 100}%` }}
-                      onClick={() => setSelectedSceneId(scene.id)}
+                      onClick={() => { setSelectedSceneId(scene.id); setFrame(scene.startFrame); }}
                       title={scene.name}
                     >{scene.name}</button>
                   ))}
