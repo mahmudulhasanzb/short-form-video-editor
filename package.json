@@ -8,9 +8,9 @@
     "packages/*"
   ],
   "scripts": {
-    "typecheck": "bun --filter '*' --if-present typecheck",
-    "test": "bun --filter '*' --if-present test",
-    "build": "bun --filter '*' --if-present build"
+    "typecheck": "bun run --filter '*' --if-present typecheck",
+    "test": "bun run --filter '*' --if-present test",
+    "build": "bun run --filter '*' --if-present build"
   },
   "devDependencies": {
     "typescript": "^5.8.3",
