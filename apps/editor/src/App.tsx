@@ -98,6 +98,30 @@ export default function App() {
     });
   }
 
+  function updateVisualElement(
+    sceneId: string,
+    alternativeId: string,
+    elementId: string,
+    patch: Partial<ScenePlan["scenes"][number]["visual"]["alternatives"][number]["elements"][number]>,
+  ) {
+    updateScene(sceneId, (scene) => ({
+      ...scene,
+      visual: {
+        ...scene.visual,
+        alternatives: scene.visual.alternatives.map((alternative) =>
+          alternative.id !== alternativeId
+            ? alternative
+            : {
+                ...alternative,
+                elements: alternative.elements.map((element) =>
+                  element.id === elementId ? { ...element, ...patch } : element,
+                ),
+              },
+        ),
+      },
+    }));
+  }
+
   function updateCaptions(sceneId: string, captions: ScenePlan["scenes"][number]["captions"]) {
     updateScene(sceneId, (scene) => ({ ...scene, captions }));
   }
@@ -319,6 +343,51 @@ export default function App() {
                       ))}
                     </div>
                   ) : <p className="helper-text">No alternatives are defined for this scene. The planner must create real compositions before they can be selected.</p>}
+
+                  {selectedAlternative?.elements.some((element) => element.kind === "video") && (
+                    <>
+                      <div className="section-divider" />
+                      <div className="field-label">VIDEO OVERLAYS</div>
+                      {selectedAlternative.elements.filter((element) => element.kind === "video").map((element) => (
+                        <div className="alternative-card" key={element.id}>
+                          <strong>{element.id}</strong>
+                          <small>Source trim is measured in source-video frames, not timeline frames.</small>
+                          <label className="field-label">SOURCE IN (FRAME)
+                            <input
+                              type="number"
+                              min={0}
+                              step={1}
+                              value={element.mediaStartFrame ?? 0}
+                              onChange={(event) => {
+                                const value = Math.max(0, Math.floor(Number(event.target.value) || 0));
+                                const end = element.mediaEndFrame;
+                                updateVisualElement(selectedScene.id, selectedAlternative.id, element.id, {
+                                  mediaStartFrame: end !== undefined && value >= end ? Math.max(0, end - 1) : value,
+                                });
+                              }}
+                            />
+                          </label>
+                          <label className="field-label">SOURCE OUT (FRAME)
+                            <input
+                              type="number"
+                              min={(element.mediaStartFrame ?? 0) + 1}
+                              step={1}
+                              value={element.mediaEndFrame ?? ""}
+                              placeholder="End of source video"
+                              onChange={(event) => {
+                                const raw = event.target.value;
+                                const value = raw === "" ? undefined : Math.max((element.mediaStartFrame ?? 0) + 1, Math.floor(Number(raw) || 0));
+                                updateVisualElement(selectedScene.id, selectedAlternative.id, element.id, {
+                                  mediaEndFrame: value,
+                                });
+                              }}
+                            />
+                          </label>
+                          <small>Clear SOURCE OUT to use the source video's remaining duration. Make sure the selected file is long enough.</small>
+                        </div>
+                      ))}
+                    </>
+                  )}
 
                   <div className="section-divider" />
                   <div className="field-label">CAMERA MOTION</div>
