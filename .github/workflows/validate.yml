@@ -3,7 +3,7 @@ name: Validate workspace
 on:
   push:
     branches:
-      - rebuild/architecture-foundation
+      - ChatGPT
   pull_request:
     branches:
       - main
@@ -15,24 +15,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v4
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          version: 10.8.1
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
+          bun-version: 1.2.0
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: bun install
 
       - name: Typecheck all packages
-        run: pnpm typecheck
+        run: bun run typecheck
 
       - name: Run tests
-        run: pnpm test
+        run: bun run test
 
       - name: Build editor
-        run: pnpm --filter @sfe/editor build
+        run: bun --filter @sfe/editor build
