@@ -13,7 +13,8 @@
     "@vitejs/plugin-react": "^4.4.1",
     "lucide-react": "^0.468.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "@remotion/player": "4.0.539"
   },
   "devDependencies": {
     "@types/react": "^19.0.0",
