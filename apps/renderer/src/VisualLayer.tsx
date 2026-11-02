@@ -6,7 +6,7 @@ import { requireAsset } from "./types";
 type Alternative = ScenePlan["scenes"][number]["visual"]["alternatives"][number];
 
 export const VisualLayer: React.FC<{
-  alternative?: Alternative;
+  alternative: Alternative | undefined;
   assets: Record<string, string>;
 }> = ({ alternative, assets }) => {
   if (!alternative) return null;
