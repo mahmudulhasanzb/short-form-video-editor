@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { Player, type CallbackListener, type PlayerRef } from "@remotion/player";
 import type { ScenePlan } from "@sfe/contracts";
 import { VideoComposition } from "../../renderer/src/VideoComposition";
