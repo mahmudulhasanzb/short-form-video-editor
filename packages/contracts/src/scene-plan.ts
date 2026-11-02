@@ -21,7 +21,7 @@ export const visualTypeSchema = z.enum([
 export const visualElementSchema = z
   .object({
     id: z.string().min(1),
-    kind: z.enum(["text", "image", "shape", "icon", "line"]),
+    kind: z.enum(["text", "image", "video", "shape", "icon", "line"]),
     x: normalizedPercent,
     y: normalizedPercent,
     width: z.number().positive().max(100),
@@ -31,6 +31,9 @@ export const visualElementSchema = z
     opacity: z.number().min(0).max(1).default(1),
     text: z.string().optional(),
     assetId: z.string().min(1).optional(),
+    /** Optional source-media trim in frames. Used by video elements only. */
+    mediaStartFrame: frame.optional(),
+    mediaEndFrame: frame.optional(),
     style: z.record(z.unknown()).default({}),
   })
   .strict()
@@ -56,11 +59,33 @@ export const visualElementSchema = z
         message: "Text elements require non-empty text.",
       });
     }
-    if (["image", "icon"].includes(element.kind) && !element.assetId) {
+    if (["image", "icon", "video"].includes(element.kind) && !element.assetId) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["assetId"],
-        message: "Image and icon elements require an assetId.",
+        message: "Image, video, and icon elements require an assetId.",
+      });
+    }
+    if (element.kind === "video") {
+      if (
+        element.mediaStartFrame !== undefined &&
+        element.mediaEndFrame !== undefined &&
+        element.mediaEndFrame <= element.mediaStartFrame
+      ) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["mediaEndFrame"],
+          message: "Video mediaEndFrame must be greater than mediaStartFrame.",
+        });
+      }
+    } else if (
+      element.mediaStartFrame !== undefined ||
+      element.mediaEndFrame !== undefined
+    ) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["mediaStartFrame"],
+        message: "Source-media trim fields are only valid for video elements.",
       });
     }
   });
