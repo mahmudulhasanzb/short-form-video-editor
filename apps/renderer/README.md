@@ -25,6 +25,10 @@ pnpm install
 pnpm --filter @sfe/renderer render -- <workspace>/planning/scene-plan.json <workspace>/assets/asset-manifest.json <workspace>/renders/final.mp4
 ```
 
+## Preview note
+
+The Remotion Studio shortcut is intentionally not exposed yet: the Studio needs a user-selected plan and workspace asset manifest, rather than fake default video data. Use the validated render CLI until the plan-loading preview bridge is implemented.
+
 ## Current scope
 
 Implemented: scene sequencing, full-speaker / split / full-canvas layouts, selected visual elements, caption chunks, camera zoom/pan, and per-scene sound cues.
