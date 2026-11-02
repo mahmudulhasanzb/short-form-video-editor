@@ -216,16 +216,45 @@ export default function App() {
               <div className="timeline-panel panel">
                 <div className="panel-heading"><span>TIMELINE</span><span className="muted">{plan.project.durationFrames} FRAMES</span></div>
                 <div className="timeline-ruler"><span>00:00</span><span>{formatTime(Math.round(plan.project.durationFrames / 2), plan.project.fps)}</span><span>{formatTime(plan.project.durationFrames, plan.project.fps)}</span></div>
-                <div className="timeline-track">
+                <div
+                  className="timeline-track"
+                  onClick={(event) => {
+                    const bounds = event.currentTarget.getBoundingClientRect();
+                    const position = (event.clientX - bounds.left) / bounds.width;
+                    const nextFrame = Math.max(
+                      0,
+                      Math.min(plan.project.durationFrames - 1, Math.floor(position * plan.project.durationFrames)),
+                    );
+                    const scene = plan.scenes.find(
+                      (item) => nextFrame >= item.startFrame && nextFrame < item.endFrame,
+                    );
+                    if (scene) setSelectedSceneId(scene.id);
+                    setFrame(nextFrame);
+                  }}
+                  role="slider"
+                  aria-label="Timeline frame"
+                  aria-valuemin={0}
+                  aria-valuemax={plan.project.durationFrames - 1}
+                  aria-valuenow={frame}
+                  tabIndex={0}
+                >
                   {plan.scenes.map((scene) => (
                     <button
                       key={scene.id}
                       className={`timeline-scene ${scene.id === selectedSceneId ? "selected" : ""}`}
                       style={{ left: `${(scene.startFrame / plan.project.durationFrames) * 100}%`, width: `${((scene.endFrame - scene.startFrame) / plan.project.durationFrames) * 100}%` }}
-                      onClick={() => { setSelectedSceneId(scene.id); setFrame(scene.startFrame); }}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        setSelectedSceneId(scene.id);
+                        setFrame(scene.startFrame);
+                      }}
                       title={scene.name}
                     >{scene.name}</button>
                   ))}
+                  <div
+                    className="timeline-playhead"
+                    style={{ left: `${(frame / Math.max(1, plan.project.durationFrames - 1)) * 100}%` }}
+                  />
                 </div>
                 <div className="timeline-legend"><span><i className="legend-scene" /> Scenes</span><span><i className="legend-caption" /> Captions</span><span><i className="legend-sound" /> Sound cues</span></div>
               </div>
