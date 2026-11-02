@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from "react";
+import { useEffect } from "react";
 import {
   AlertCircle,
   Check,
@@ -39,10 +40,39 @@ export default function App() {
   const playerRef = useRef<PlayerRef>(null);
   const [assetFiles, setAssetFiles] = useState<Record<string, File>>({});
   const [assetUrls, setAssetUrls] = useState<Record<string, string>>({});
+  const [videoMetadata, setVideoMetadata] = useState<Record<string, { duration: number; width: number; height: number }>>({});
   const [pendingAssetId, setPendingAssetId] = useState<string | null>(null);
   const assetInput = useRef<HTMLInputElement>(null);
   const videoInput = useRef<HTMLInputElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    const videos = Object.entries(assetUrls).filter(([, url]) => url);
+    for (const [assetId, url] of videos) {
+      if (videoMetadata[assetId]) continue;
+      const video = document.createElement("video");
+      video.preload = "metadata";
+      video.src = url;
+      video.onloadedmetadata = () => {
+        if (cancelled || !Number.isFinite(video.duration)) return;
+        setVideoMetadata((current) => ({
+          ...current,
+          [assetId]: {
+            duration: video.duration,
+            width: video.videoWidth,
+            height: video.videoHeight,
+          },
+        }));
+      };
+      video.onerror = () => {
+        if (!cancelled) setNotice({ kind: "error", message: `Could not read video metadata for ${assetId}.` });
+      };
+    }
+    return () => {
+      cancelled = true;
+    };
+  }, [assetUrls, videoMetadata]);
 
   const selectedScene = useMemo(
     () => plan?.scenes.find((scene) => scene.id === selectedSceneId) ?? null,
@@ -256,6 +286,7 @@ export default function App() {
                   <input ref={videoInput} type="file" accept="video/*" hidden onChange={(event) => { const file = event.target.files?.[0]; if (file) attachAsset(plan.source.videoAssetId, file); if (event.target) event.target.value = ""; }} />
                   <button className="small-button" onClick={() => videoInput.current?.click()}>{assetUrls[plan.source.videoAssetId] ? "Replace source video" : "Attach source video"}</button>
                   <span>{assetUrls[plan.source.videoAssetId] ? "Source attached for this tab" : "Attach source to preview footage"}</span>
+                  {videoMetadata[plan.source.videoAssetId] && <span>{videoMetadata[plan.source.videoAssetId].width}×{videoMetadata[plan.source.videoAssetId].height} · {videoMetadata[plan.source.videoAssetId].duration.toFixed(1)}s</span>}
                   {referencedAssetIds(plan).filter((assetId) => assetId !== plan.source.videoAssetId).map((assetId) => (
                     <button
                       key={assetId}
