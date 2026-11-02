@@ -379,6 +379,62 @@ export default function App() {
                     </div>
                   ) : <p className="helper-text">No alternatives are defined for this scene. The planner must create real compositions before they can be selected.</p>}
 
+                  {selectedAlternative?.elements.some((element) => element.kind === "text") && (
+                    <>
+                      <div className="section-divider" />
+                      <div className="field-label">TEXT INSPECTOR</div>
+                      {selectedAlternative.elements.filter((element) => element.kind === "text").map((element) => {
+                        const style = (element.style ?? {}) as Record<string, unknown>;
+                        const numeric = (key: "x" | "y" | "width" | "height", raw: string) => {
+                          const value = Number(raw);
+                          if (!Number.isFinite(value)) return;
+                          const max = key === "x" ? 100 - element.width : key === "y" ? 100 - element.height : 100;
+                          const min = key === "width" ? 0.1 : key === "height" ? 0.1 : 0;
+                          const next = Math.max(min, Math.min(max, value));
+                          updateVisualElement(selectedScene.id, selectedAlternative.id, element.id, { [key]: next });
+                        };
+                        const updateStyle = (key: string, value: unknown) =>
+                          updateVisualElement(selectedScene.id, selectedAlternative.id, element.id, {
+                            style: { ...style, [key]: value },
+                          });
+                        return (
+                          <div className="alternative-card" key={element.id}>
+                            <strong>{element.id}</strong>
+                            <label className="field-label">TEXT
+                              <textarea rows={3} value={element.text ?? ""} onChange={(event) => updateVisualElement(selectedScene.id, selectedAlternative.id, element.id, { text: event.target.value })} />
+                            </label>
+                            <div className="field-grid">
+                              {(["x", "y", "width", "height"] as const).map((key) => (
+                                <label className="field-label" key={key}>{key.toUpperCase()} (%)
+                                  <input type="number" min={key === "width" || key === "height" ? 0.1 : 0} max={100} step={0.5} value={element[key]} onChange={(event) => numeric(key, event.target.value)} />
+                                </label>
+                              ))}
+                            </div>
+                            <label className="field-label">FONT SIZE (PX)
+                              <input type="number" min={8} max={240} value={Number(style.fontSize ?? 48)} onChange={(event) => updateStyle("fontSize", Math.max(8, Math.min(240, Number(event.target.value) || 8)))} />
+                            </label>
+                            <label className="field-label">FONT FAMILY
+                              <input value={String(style.fontFamily ?? "Arial")} onChange={(event) => updateStyle("fontFamily", event.target.value)} />
+                            </label>
+                            <label className="field-label">TEXT COLOR
+                              <input type="color" value={/^#[0-9a-fA-F]{6}$/.test(String(style.color ?? "#ffffff")) ? String(style.color ?? "#ffffff") : "#ffffff"} onChange={(event) => updateStyle("color", event.target.value)} />
+                            </label>
+                            <label className="field-label">FONT WEIGHT
+                              <select value={String(style.fontWeight ?? 700)} onChange={(event) => updateStyle("fontWeight", Number(event.target.value))}>
+                                <option value="400">Regular</option><option value="500">Medium</option><option value="600">Semi-bold</option><option value="700">Bold</option><option value="800">Extra-bold</option>
+                              </select>
+                            </label>
+                            <label className="field-label">ALIGNMENT
+                              <select value={String(style.textAlign ?? "center")} onChange={(event) => updateStyle("textAlign", event.target.value)}>
+                                <option value="left">Left</option><option value="center">Center</option><option value="right">Right</option>
+                              </select>
+                            </label>
+                          </div>
+                        );
+                      })}
+                    </>
+                  )}
+
                   {selectedAlternative?.elements.some((element) => element.kind === "video") && (
                     <>
                       <div className="section-divider" />
