@@ -1,5 +1,5 @@
 import React from "react";
-import { AbsoluteFill, Img } from "remotion";
+import { AbsoluteFill, Img, Video } from "remotion";
 import type { ScenePlan } from "@sfe/contracts";
 import { requireAsset } from "./types";
 
@@ -34,6 +34,18 @@ export const VisualLayer: React.FC<{
               key={element.id}
               src={requireAsset(assets, element.assetId!, `visual element "${element.id}"`)}
               style={{ ...base, objectFit: "contain" }}
+            />
+          );
+        }
+
+        if (element.kind === "video") {
+          return (
+            <Video
+              key={element.id}
+              src={requireAsset(assets, element.assetId!, `video visual element "${element.id}"`)}
+              startFrom={element.mediaStartFrame ?? 0}
+              endAt={element.mediaEndFrame}
+              style={{ ...base, objectFit: "cover" }}
             />
           );
         }
