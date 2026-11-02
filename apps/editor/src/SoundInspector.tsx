@@ -13,6 +13,20 @@ export function SoundInspector({ scene, fps, assets, onChange, onAssetUpload }: 
 }) {
   const inputs = useRef<Record<string, HTMLInputElement | null>>({});
   const update = (id: string, patch: Partial<SoundEffect>) => onChange(scene.soundEffects.map((effect) => effect.id === id ? { ...effect, ...patch } : effect));
+  const updateTiming = (effect: SoundEffect, field: "startFrame" | "durationFrames", value: number) => {
+    if (field === "startFrame") {
+      const startFrame = Math.max(scene.startFrame, Math.min(scene.endFrame - 1, value));
+      update(effect.id, {
+        startFrame,
+        durationFrames: Math.min(effect.durationFrames, scene.endFrame - startFrame),
+      });
+      return;
+    }
+
+    update(effect.id, {
+      durationFrames: Math.max(1, Math.min(scene.endFrame - effect.startFrame, value)),
+    });
+  };
   const addCue = () => {
     const id = "sfx-" + Date.now().toString(36);
     onChange([...scene.soundEffects, { id, assetId: id, startFrame: scene.startFrame, durationFrames: Math.max(1, Math.min(fps, scene.endFrame - scene.startFrame)), volumeDb: -12, enabled: true }]);
@@ -28,8 +42,8 @@ export function SoundInspector({ scene, fps, assets, onChange, onAssetUpload }: 
       </div>
       {assets[effect.assetId] && <audio className="audio-audition" controls preload="metadata" src={assets[effect.assetId]}/>}
       <div className="chunk-timing">
-        <label>START FRAME<input type="number" min={scene.startFrame} max={scene.endFrame - 1} value={effect.startFrame} onChange={(e) => update(effect.id, { startFrame: Number(e.target.value) })}/></label>
-        <label>DURATION<input type="number" min={1} max={scene.endFrame - effect.startFrame} value={effect.durationFrames} onChange={(e) => update(effect.id, { durationFrames: Number(e.target.value) })}/></label>
+        <label>START FRAME<input type="number" min={scene.startFrame} max={scene.endFrame - 1} value={effect.startFrame} onChange={(e) => updateTiming(effect, "startFrame", Number(e.target.value))}/></label>
+        <label>DURATION<input type="number" min={1} max={scene.endFrame - effect.startFrame} value={effect.durationFrames} onChange={(e) => updateTiming(effect, "durationFrames", Number(e.target.value))}/></label>
       </div>
       <label className="field-label volume-field">VOLUME · {effect.volumeDb} dB<input type="range" min="-60" max="6" step="1" value={effect.volumeDb} onChange={(e) => update(effect.id, { volumeDb: Number(e.target.value) })}/></label>
       <button type="button" className="text-button danger" onClick={() => onChange(scene.soundEffects.filter((item) => item.id !== effect.id))}>Remove cue</button>
