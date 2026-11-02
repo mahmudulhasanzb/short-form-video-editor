@@ -1,5 +1,4 @@
-import { useMemo, useRef, useState } from "react";
-import { useEffect } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   AlertCircle,
   Check,
@@ -120,6 +119,11 @@ export default function App() {
   }
 
   function attachAsset(assetId: string, file: File) {
+    setVideoMetadata((current) => {
+      const next = { ...current };
+      delete next[assetId];
+      return next;
+    });
     setAssetFiles((current) => ({ ...current, [assetId]: file }));
     setAssetUrls((current) => {
       const oldUrl = current[assetId];
