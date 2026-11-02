@@ -16,6 +16,9 @@ import {
   WandSparkles,
 } from "lucide-react";
 import { scenePlanSchema, type ScenePlan } from "@sfe/contracts";
+import { PlanPreview } from "./PlanPreview";
+import { CaptionInspector } from "./CaptionInspector";
+import { SoundInspector } from "./SoundInspector";
 
 type Notice = { kind: "success" | "error"; message: string };
 
@@ -28,6 +31,10 @@ export default function App() {
   const [plan, setPlan] = useState<ScenePlan | null>(null);
   const [selectedSceneId, setSelectedSceneId] = useState<string | null>(null);
   const [notice, setNotice] = useState<Notice | null>(null);
+  const [frame, setFrame] = useState(0);
+  const [assetFiles, setAssetFiles] = useState<Record<string, File>>({});
+  const [assetUrls, setAssetUrls] = useState<Record<string, string>>({});
+  const videoInput = useRef<HTMLInputElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
 
   const selectedScene = useMemo(
@@ -65,6 +72,7 @@ export default function App() {
       const parsed = scenePlanSchema.parse(raw);
       setPlan(parsed);
       setSelectedSceneId(parsed.scenes[0]?.id ?? null);
+      setFrame(parsed.scenes[0]?.startFrame ?? 0);
       setNotice({ kind: "success", message: "Scene plan loaded and validated." });
     } catch (error) {
       const message =
@@ -72,6 +80,23 @@ export default function App() {
       setNotice({ kind: "error", message: `Could not load plan: ${message}` });
     }
     if (fileInput.current) fileInput.current.value = "";
+  }
+
+  function attachAsset(assetId: string, file: File) {
+    setAssetFiles((current) => ({ ...current, [assetId]: file }));
+    setAssetUrls((current) => {
+      const oldUrl = current[assetId];
+      if (oldUrl) URL.revokeObjectURL(oldUrl);
+      return { ...current, [assetId]: URL.createObjectURL(file) };
+    });
+  }
+
+  function updateCaptions(sceneId: string, captions: ScenePlan["scenes"][number]["captions"]) {
+    updateScene(sceneId, (scene) => ({ ...scene, captions }));
+  }
+
+  function updateSoundEffects(sceneId: string, soundEffects: ScenePlan["scenes"][number]["soundEffects"]) {
+    updateScene(sceneId, (scene) => ({ ...scene, soundEffects }));
   }
 
   function exportPlan() {
@@ -162,7 +187,7 @@ export default function App() {
                   <button
                     key={scene.id}
                     className={`scene-row ${scene.id === selectedSceneId ? "active" : ""}`}
-                    onClick={() => setSelectedSceneId(scene.id)}
+                    onClick={() => { setSelectedSceneId(scene.id); setFrame(scene.startFrame); }}
                   >
                     <span className="scene-number">{String(index + 1).padStart(2, "0")}</span>
                     <span className="scene-info"><strong>{scene.name}</strong><small>{formatTime(scene.startFrame, plan.project.fps)} – {formatTime(scene.endFrame, plan.project.fps)}</small></span>
@@ -177,44 +202,15 @@ export default function App() {
                 <div className="panel-heading"><span>LIVE PREVIEW</span><span className="preview-badge">PLAN PREVIEW</span></div>
                 <div className="preview-stage">
                   <div className="preview-frame" style={{ aspectRatio: `${plan.project.width} / ${plan.project.height}` }}>
-                    <div className="preview-safe-area">
-                      {selectedScene && selectedScene.visual.type !== "none" && selectedAlternative ? (
-                        <div className="visual-preview">
-                          {selectedAlternative.elements.map((element) => (
-                            <div
-                              key={element.id}
-                              className={`visual-element ${element.kind}`}
-                              style={{
-                                left: `${element.x}%`,
-                                top: `${element.y}%`,
-                                width: `${element.width}%`,
-                                height: `${element.height}%`,
-                                zIndex: element.zIndex,
-                                opacity: element.opacity,
-                              }}
-                            >
-                              {element.kind === "text" ? element.text : element.assetId ? `Asset: ${element.assetId}` : element.kind}
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="preview-empty">
-                          <Film size={28} />
-                          <strong>Source video preview unavailable</strong>
-                          <span>Link the cleaned source media in the workspace to preview speaker footage.</span>
-                        </div>
-                      )}
-                      {selectedScene?.captions.enabled && selectedScene.captions.chunks[0] && (
-                        <div className="caption-preview">
-                          {selectedScene.captions.chunks[0].words.map((word) => (
-                            <span className={word.highlighted ? "highlight" : ""} key={word.id}>{word.text}</span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
+                    <PlanPreview plan={plan} assets={assetUrls} frame={frame} onFrameChange={setFrame} />
                   </div>
                 </div>
-                <div className="preview-controls"><button className="icon-button" aria-label="Preview"><Play size={15} /></button><span>{selectedScene ? formatTime(selectedScene.startFrame, plan.project.fps) : "—"}</span><span className="control-divider" /><span>{selectedScene ? formatTime(selectedScene.endFrame, plan.project.fps) : "—"}</span><span className="control-spacer" /><span>Preview reflects plan elements; source-media playback integration is pending.</span></div>
+                <div className="preview-asset-bar">
+                  <input ref={videoInput} type="file" accept="video/*" hidden onChange={(event) => { const file = event.target.files?.[0]; if (file) attachAsset(plan.source.videoAssetId, file); if (event.target) event.target.value = ""; }} />
+                  <button className="small-button" onClick={() => videoInput.current?.click()}>{assetUrls[plan.source.videoAssetId] ? "Replace source video" : "Attach source video"}</button>
+                  <span>{assetUrls[plan.source.videoAssetId] ? "Source attached for this tab" : "Attach source to preview footage"}</span>
+                </div>
+                <div className="preview-controls"><button className="icon-button" aria-label="Preview"><Play size={15} /></button><span>{formatTime(frame, plan.project.fps)}</span><span className="control-divider" /><span>{selectedScene ? formatTime(selectedScene.endFrame, plan.project.fps) : "—"}</span><span className="control-spacer" /><span>Shared Remotion preview · frame {frame}</span></div>
               </div>
 
               <div className="timeline-panel panel">
@@ -260,10 +256,9 @@ export default function App() {
                   {selectedScene.cameraMotion.enabled && <label className="field-label">MOTION TYPE<select value={selectedScene.cameraMotion.type ?? "zoom-in"} onChange={(event) => updateScene(selectedScene.id, (scene) => ({ ...scene, cameraMotion: { ...scene.cameraMotion, type: event.target.value as NonNullable<typeof scene.cameraMotion.type> } }))}><option value="zoom-in">Zoom In</option><option value="zoom-out">Zoom Out</option><option value="pan-left">Pan Left</option><option value="pan-right">Pan Right</option></select></label>}
 
                   <div className="section-divider" />
-                  <div className="inspector-summary"><span><Volume2 size={14} /> SOUND EFFECTS</span><strong>{selectedScene.soundEffects.length}</strong></div>
-                  <p className="helper-text">Sound cue selection, auditioning, timing, and volume controls are scheduled for the next editor milestone.</p>
-                  <div className="inspector-summary"><span><WandSparkles size={14} /> CAPTION CHUNKS</span><strong>{selectedScene.captions.chunks.length}</strong></div>
-                  <p className="helper-text">Caption data is loaded from the plan. Word-level editing and timing controls are next.</p>
+                  <CaptionInspector scene={selectedScene} fps={plan.project.fps} onChange={(captions) => updateCaptions(selectedScene.id, captions)} />
+                  <div className="section-divider" />
+                  <SoundInspector scene={selectedScene} fps={plan.project.fps} assets={assetUrls} onChange={(effects) => updateSoundEffects(selectedScene.id, effects)} onAssetUpload={attachAsset} />
                 </div>
               ) : <p className="helper-text">Select a scene to edit its properties.</p>}
             </aside>
