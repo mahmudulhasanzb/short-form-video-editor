@@ -21,6 +21,7 @@ import type { PlayerRef } from "@remotion/player";
 import { PlanPreview } from "./PlanPreview";
 import { CaptionInspector } from "./CaptionInspector";
 import { SoundInspector } from "./SoundInspector";
+import { referencedAssetIds } from "./asset-utils";
 
 type Notice = { kind: "success" | "error"; message: string };
 
@@ -38,6 +39,8 @@ export default function App() {
   const playerRef = useRef<PlayerRef>(null);
   const [assetFiles, setAssetFiles] = useState<Record<string, File>>({});
   const [assetUrls, setAssetUrls] = useState<Record<string, string>>({});
+  const [pendingAssetId, setPendingAssetId] = useState<string | null>(null);
+  const assetInput = useRef<HTMLInputElement>(null);
   const videoInput = useRef<HTMLInputElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
 
@@ -225,9 +228,20 @@ export default function App() {
                   </div>
                 </div>
                 <div className="preview-asset-bar">
+                  <input ref={assetInput} type="file" accept="image/*,video/*" hidden onChange={(event) => { const file = event.target.files?.[0]; if (file && pendingAssetId) attachAsset(pendingAssetId, file); setPendingAssetId(null); if (event.target) event.target.value = ""; }} />
                   <input ref={videoInput} type="file" accept="video/*" hidden onChange={(event) => { const file = event.target.files?.[0]; if (file) attachAsset(plan.source.videoAssetId, file); if (event.target) event.target.value = ""; }} />
                   <button className="small-button" onClick={() => videoInput.current?.click()}>{assetUrls[plan.source.videoAssetId] ? "Replace source video" : "Attach source video"}</button>
                   <span>{assetUrls[plan.source.videoAssetId] ? "Source attached for this tab" : "Attach source to preview footage"}</span>
+                  {referencedAssetIds(plan).filter((assetId) => assetId !== plan.source.videoAssetId).map((assetId) => (
+                    <button
+                      key={assetId}
+                      className="small-button"
+                      onClick={() => { setPendingAssetId(assetId); assetInput.current?.click(); }}
+                      title={assetFiles[assetId]?.name ?? assetId}
+                    >
+                      {assetUrls[assetId] ? "Replace" : "Attach"} {assetId}
+                    </button>
+                  ))}
                 </div>
                 <div className="preview-controls"><button className="icon-button" onClickCapture={(event) => playerRef.current?.toggle(event)} aria-label={isPlaying ? "Pause preview" : "Play preview"} title={isPlaying ? "Pause" : "Play"}>{isPlaying ? <Pause size={15} /> : <Play size={15} />}</button><span>{formatTime(frame, plan.project.fps)}</span><span className="control-divider" /><span>{selectedScene ? formatTime(selectedScene.endFrame, plan.project.fps) : "—"}</span><span className="control-spacer" /><span>Shared Remotion preview · frame {frame}</span></div>
               </div>
