@@ -11,6 +11,7 @@ export function PlanPreview({ plan, assets, frame, onFrameChange }: {
   onFrameChange: (frame: number) => void;
 }) {
   const playerRef = useRef<PlayerRef>(null);
+  const currentFrameRef = useRef(frame);
   const inputProps: RenderInputProps = { plan, assets };
 
   useEffect(() => {
@@ -18,6 +19,7 @@ export function PlanPreview({ plan, assets, frame, onFrameChange }: {
     if (!player) return;
 
     const onUpdate: CallbackListener<"frameupdate"> = (e) => {
+      currentFrameRef.current = e.detail.frame;
       onFrameChange(e.detail.frame);
     };
 
@@ -26,6 +28,14 @@ export function PlanPreview({ plan, assets, frame, onFrameChange }: {
       player.removeEventListener("frameupdate", onUpdate);
     };
   }, [onFrameChange]);
+
+  useEffect(() => {
+    const player = playerRef.current;
+    if (!player || currentFrameRef.current === frame) return;
+
+    player.seekTo(frame);
+    currentFrameRef.current = frame;
+  }, [frame]);
 
   return <Player
     ref={playerRef}
