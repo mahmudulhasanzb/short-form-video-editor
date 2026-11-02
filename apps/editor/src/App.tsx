@@ -229,7 +229,7 @@ export default function App() {
                   <button className="small-button" onClick={() => videoInput.current?.click()}>{assetUrls[plan.source.videoAssetId] ? "Replace source video" : "Attach source video"}</button>
                   <span>{assetUrls[plan.source.videoAssetId] ? "Source attached for this tab" : "Attach source to preview footage"}</span>
                 </div>
-                <div className="preview-controls"><button className="icon-button" onClick={(event) => playerRef.current?.toggle(event)} aria-label={isPlaying ? "Pause preview" : "Play preview"} title={isPlaying ? "Pause" : "Play"}>{isPlaying ? <Pause size={15} /> : <Play size={15} />}</button><span>{formatTime(frame, plan.project.fps)}</span><span className="control-divider" /><span>{selectedScene ? formatTime(selectedScene.endFrame, plan.project.fps) : "—"}</span><span className="control-spacer" /><span>Shared Remotion preview · frame {frame}</span></div>
+                <div className="preview-controls"><button className="icon-button" onClickCapture={(event) => playerRef.current?.toggle(event)} aria-label={isPlaying ? "Pause preview" : "Play preview"} title={isPlaying ? "Pause" : "Play"}>{isPlaying ? <Pause size={15} /> : <Play size={15} />}</button><span>{formatTime(frame, plan.project.fps)}</span><span className="control-divider" /><span>{selectedScene ? formatTime(selectedScene.endFrame, plan.project.fps) : "—"}</span><span className="control-spacer" /><span>Shared Remotion preview · frame {frame}</span></div>
               </div>
 
               <div className="timeline-panel panel">
