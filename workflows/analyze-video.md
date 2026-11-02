@@ -7,6 +7,7 @@ Understand the cleaned video and transcript before making visual decisions. The 
 - Verified cleaned video.
 - Word-level transcript with timestamps.
 - Optional user-provided images, screen captures, brand assets, or reference material.
+- Optional user-provided B-roll / additional footage, including clips that may need source trimming.
 
 ## Process
 1. Confirm the cleaned video passed verification.
@@ -16,7 +17,9 @@ Understand the cleaned video and transcript before making visual decisions. The 
 5. For each beat, write down the one thing the viewer should understand or feel.
 6. Choose the simplest visual form that communicates that idea: speaker-only, a few words of typography, a comparison, a process diagram, a timeline, a relevant image/object, a genuine product/UI demonstration, or another justified composition.
 7. Choose Full Speaker, 50/50 Split, or Full Canvas only after the visual idea is clear. A layout must serve the idea; it is not a visual idea by itself.
-8. Record uncertainty and missing source material explicitly. Do not invent facts, metrics, product interfaces, brands, or external assets.
+8. For each supplied image or footage clip, identify its visible subject/action and compare it with the transcript beats. Recommend placement only where the content is relevant; note the matching transcript evidence and intended screen treatment.
+9. For supplied footage, recommend a source-media in/out range when a shorter moment is clearly useful. Keep source-media trim frames separate from the scene's project-timeline frames; if the exact useful range cannot be verified, leave it untrimmed and flag the uncertainty.
+10. Record uncertainty and missing source material explicitly. Do not invent facts, metrics, product interfaces, brands, or external assets.
 
 ## Anti-template visual direction
 - Do not assign a UI card to every scene. Many beats should remain speaker-only or use restrained typography.
