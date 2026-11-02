@@ -120,6 +120,21 @@ export default function App() {
 
   const validation = plan ? scenePlanSchema.safeParse(plan) : null;
 
+  function seekTimeline(clientX: number, track: HTMLDivElement) {
+    if (!plan) return;
+    const bounds = track.getBoundingClientRect();
+    const position = Math.max(0, Math.min(1, (clientX - bounds.left) / bounds.width));
+    const nextFrame = Math.min(
+      plan.project.durationFrames - 1,
+      Math.floor(position * plan.project.durationFrames),
+    );
+    const scene = plan.scenes.find(
+      (item) => nextFrame >= item.startFrame && nextFrame < item.endFrame,
+    );
+    if (scene) setSelectedSceneId(scene.id);
+    setFrame(nextFrame);
+  }
+
   return (
     <main className="app-shell">
       <header className="topbar">
@@ -218,38 +233,46 @@ export default function App() {
                 <div className="timeline-ruler"><span>00:00</span><span>{formatTime(Math.round(plan.project.durationFrames / 2), plan.project.fps)}</span><span>{formatTime(plan.project.durationFrames, plan.project.fps)}</span></div>
                 <div
                   className="timeline-track"
-                  onClick={(event) => {
-                    const bounds = event.currentTarget.getBoundingClientRect();
-                    const position = (event.clientX - bounds.left) / bounds.width;
-                    const nextFrame = Math.max(
-                      0,
-                      Math.min(plan.project.durationFrames - 1, Math.floor(position * plan.project.durationFrames)),
-                    );
+                  onClick={(event) => seekTimeline(event.clientX, event.currentTarget)}
+                  onPointerDown={(event) => {
+                    event.currentTarget.setPointerCapture(event.pointerId);
+                    seekTimeline(event.clientX, event.currentTarget);
+                  }}
+                  onPointerMove={(event) => {
+                    if (event.buttons === 1) seekTimeline(event.clientX, event.currentTarget);
+                  }}
+                  onKeyDown={(event) => {
+                    const step = event.shiftKey ? 10 : 1;
+                    let nextFrame = frame;
+                    if (event.key === "ArrowLeft" || event.key === "ArrowDown") nextFrame -= step;
+                    else if (event.key === "ArrowRight" || event.key === "ArrowUp") nextFrame += step;
+                    else if (event.key === "Home") nextFrame = 0;
+                    else if (event.key === "End") nextFrame = plan.project.durationFrames - 1;
+                    else return;
+                    event.preventDefault();
+                    const clampedFrame = Math.max(0, Math.min(plan.project.durationFrames - 1, nextFrame));
                     const scene = plan.scenes.find(
-                      (item) => nextFrame >= item.startFrame && nextFrame < item.endFrame,
+                      (item) => clampedFrame >= item.startFrame && clampedFrame < item.endFrame,
                     );
                     if (scene) setSelectedSceneId(scene.id);
-                    setFrame(nextFrame);
+                    setFrame(clampedFrame);
                   }}
                   role="slider"
                   aria-label="Timeline frame"
+                  aria-orientation="horizontal"
                   aria-valuemin={0}
                   aria-valuemax={plan.project.durationFrames - 1}
                   aria-valuenow={frame}
+                  aria-valuetext={`Frame ${frame}, ${formatTime(frame, plan.project.fps)}`}
                   tabIndex={0}
                 >
                   {plan.scenes.map((scene) => (
-                    <button
+                    <div
                       key={scene.id}
                       className={`timeline-scene ${scene.id === selectedSceneId ? "selected" : ""}`}
                       style={{ left: `${(scene.startFrame / plan.project.durationFrames) * 100}%`, width: `${((scene.endFrame - scene.startFrame) / plan.project.durationFrames) * 100}%` }}
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        setSelectedSceneId(scene.id);
-                        setFrame(scene.startFrame);
-                      }}
                       title={scene.name}
-                    >{scene.name}</button>
+                    >{scene.name}</div>
                   ))}
                   <div
                     className="timeline-playhead"
