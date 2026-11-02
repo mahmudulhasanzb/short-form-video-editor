@@ -290,7 +290,7 @@ export default function App() {
                   <input ref={videoInput} type="file" accept="video/*" hidden onChange={(event) => { const file = event.target.files?.[0]; if (file) attachAsset(plan.source.videoAssetId, file); if (event.target) event.target.value = ""; }} />
                   <button className="small-button" onClick={() => videoInput.current?.click()}>{assetUrls[plan.source.videoAssetId] ? "Replace source video" : "Attach source video"}</button>
                   <span>{assetUrls[plan.source.videoAssetId] ? "Source attached for this tab" : "Attach source to preview footage"}</span>
-                  {videoMetadata[plan.source.videoAssetId] && <span>{videoMetadata[plan.source.videoAssetId].width}×{videoMetadata[plan.source.videoAssetId].height} · {videoMetadata[plan.source.videoAssetId].duration.toFixed(1)}s</span>}
+                  {videoMetadata[plan.source.videoAssetId] && <span>{videoMetadata[plan.source.videoAssetId]?.width}×{videoMetadata[plan.source.videoAssetId]?.height} · {videoMetadata[plan.source.videoAssetId]?.duration.toFixed(1)}s</span>}
                   {referencedAssetIds(plan).filter((assetId) => assetId !== plan.source.videoAssetId).map((assetId) => (
                     <button
                       key={assetId}

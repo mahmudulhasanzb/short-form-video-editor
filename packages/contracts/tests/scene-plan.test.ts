@@ -178,7 +178,7 @@ describe("scenePlanSchema", () => {
     expect(result.success).toBe(true);
   });
 
-  it("rejects a video visual element with an invalid source trim", () => {
+  it("rejects a video overlay timeline window that exceeds its scene", () => {\n    const first = validPlan.scenes[0];\n    const result = scenePlanSchema.safeParse({\n      ...validPlan,\n      scenes: [{\n        ...first,\n        visual: {\n          type: "image",\n          alternatives: [{\n            id: "visual-01", label: "Out of bounds", compositionType: "image-led", rationale: "Test timeline bounds.",\n            elements: [{ id: "footage-01", kind: "video", assetId: "b-roll-01", x: 0, y: 0, width: 100, height: 100, zIndex: 1, timelineStartFrame: 20, timelineEndFrame: 160 }],\n          }],\n          selectedAlternativeId: "visual-01",\n        },\n      }],\n    });\n    expect(result.success).toBe(false);\n  });\n\n  it("rejects a video visual element with an invalid source trim", () => {
     const first = validPlan.scenes[0];
     const result = scenePlanSchema.safeParse({
       ...validPlan,
