@@ -3,7 +3,7 @@
 ## Preconditions
 - The user has reviewed and explicitly approved the current scene plan.
 - The plan passes schema and semantic validation.
-- Every referenced visual and enabled sound asset resolves through the workspace asset manifest.
+- Every selected visual and enabled sound asset resolves through the workspace asset manifest.
 - The cleaned source video passed media verification.
 - Caption font-family values refer to fonts available in the render environment. The current renderer does not register local font files from assets/fonts/; do not treat a font file as loaded unless that loading has been separately implemented and verified.
 
