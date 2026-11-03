@@ -1,6 +1,6 @@
 # Skill Integration: Editing Decisions, Motion, and Sound
 
-This project borrows selected craft methods from the six reviewed open-source editing skills. It does not import their templates, visual identities, or separate render engines. The validated `scene-plan.json` remains the source of truth for preview and export.
+This project borrows selected craft methods from reviewed open-source editing skills. It does not import their templates, visual identities, or separate render engines. The validated `scene-plan.json` remains the source of truth for storyboard, preview, and export. The storyboard is the review artifact; this is intentionally not a general-purpose video-editor UI.
 
 ## What was reviewed
 
@@ -93,3 +93,25 @@ Before calling a plan ready:
 - Validate the scene plan and run automated tests.
 
 After implementation phases are complete, manually inspect preview, representative rendered frames, exported video, and audio. CI passing is not proof of visual or audio quality.
+
+
+## 7. Storyboard as the primary editorial surface
+
+The storyboard is a visual shot list, not an editing-console dashboard.
+
+- Show each scene as a single editorial card in sequence. Keep its source still and its editable decisions together.
+- The thumbnail must be a real frame sampled from the supplied source video at a representative timestamp. Label it with the source time. Never substitute generated people, stock, or unrelated images and present them as source footage.
+- Scene title, time range, duration, transcript evidence, visual intention, composition and caption state belong to that card.
+- Keep controls in the scene card that owns the data. Avoid a scene sidebar plus detached properties panel. Do not make a giant preview player the primary surface.
+- A storyboard thumbnail is a still for reviewing shot intent. It is not the final rendered frame and should not be described as such.
+- Keep media File objects and browser Blob URLs in ephemeral UI state. The JSON plan must contain stable asset IDs, never browser-local URLs.
+- Every edit must update the same validated scene plan used by the renderer. An export/reopen round-trip must retain all user edits.
+- If a media frame cannot be decoded, show an explicit error for that card. Never silently draw a fake placeholder that looks like an actual source frame.
+
+## 8. Design system and implementation references
+
+The storyboard surface adopts operating-mode craft guidance from [pbakaus/impeccable](https://github.com/pbakaus/impeccable): content-led hierarchy, readable real data, spacing rhythm, meaningful interaction states, keyboard focus, contrast, responsive structure, and a strong ban on generic AI-dashboard decoration. Its Apache-2.0 source is reviewed as a design-method reference; this repository does not vendor its scripts or agents.
+
+The video workflow also adopts selected evidence and validation techniques from [gitethanwoo/video-editing](https://github.com/gitethanwoo/video-editing): probe actual media, preserve source facts, separate observed evidence from editorial interpretation, use representative frame/contact-sheet review, render cheap review passes before a master, and validate the final file. Its MIT source is reviewed as an approach reference; no external code is copied into this repository.
+
+These references inform craft and verification only. They do not impose a fixed look, scene count, transition style, music bed, effect quota, or reusable visual preset.
