@@ -18,6 +18,13 @@ export const visualTypeSchema = z.enum([
   "none",
 ]);
 
+export const visualElementMotionSchema = z.object({
+  enter: z.enum(["fade", "rise", "slide-left", "slide-right", "scale", "pop", "none"]).default("none"),
+  exit: z.enum(["fade", "drop", "none"]).default("none"),
+  delayFrames: frame.default(0),
+  durationFrames: z.number().int().positive().max(90).default(12),
+}).strict();
+
 export const visualElementSchema = z
   .object({
     id: z.string().min(1),
@@ -38,6 +45,7 @@ export const visualElementSchema = z
     timelineStartFrame: frame.optional(),
     timelineEndFrame: frame.optional(),
     style: z.record(z.unknown()).default({}),
+    motion: visualElementMotionSchema.optional(),
   })
   .strict()
   .superRefine((element, context) => {
