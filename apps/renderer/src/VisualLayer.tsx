@@ -1,8 +1,9 @@
 import React from "react";
-import { AbsoluteFill, Img, Sequence, Video } from "remotion";
+import { AbsoluteFill, Img, Sequence, Video, useCurrentFrame } from "remotion";
 import type { ScenePlan } from "@sfe/contracts";
 import { requireAsset } from "./types";
 import { getVisualElementStyle } from "./visualElementStyle";
+import { getVisualElementMotionStyle } from "./visual-element-motion";
 
 type Alternative = ScenePlan["scenes"][number]["visual"]["alternatives"][number];
 
@@ -11,12 +12,15 @@ export const VisualLayer: React.FC<{
   assets: Record<string, string>;
   sceneDurationFrames: number;
 }> = ({ alternative, assets, sceneDurationFrames }) => {
+  const frame = useCurrentFrame();
   if (!alternative) return null;
 
   return (
     <AbsoluteFill>
       {alternative.elements.map((element) => {
         const base = getVisualElementStyle(element);
+        const motion = getVisualElementMotionStyle(frame, sceneDurationFrames, element.rotation, element.motion);
+        const animatedStyle = { ...base, ...motion };
 
         if (element.kind === "image" || element.kind === "icon") {
           return (
@@ -24,7 +28,7 @@ export const VisualLayer: React.FC<{
               key={element.id}
               src={requireAsset(assets, element.assetId!, `visual element "${element.id}"`)}
               style={{
-                ...base,
+                ...animatedStyle,
                 objectFit: (element.style?.objectFit as React.CSSProperties["objectFit"]) ?? "contain",
               }}
             />
@@ -41,7 +45,7 @@ export const VisualLayer: React.FC<{
                 startFrom={element.mediaStartFrame ?? 0}
                 endAt={element.mediaEndFrame}
                 style={{
-                  ...base,
+                  ...animatedStyle,
                   objectFit: (element.style?.objectFit as React.CSSProperties["objectFit"]) ?? "cover",
                 }}
               />
@@ -54,7 +58,7 @@ export const VisualLayer: React.FC<{
             <div
               key={element.id}
               style={{
-                ...base,
+                ...animatedStyle,
                 height: Number(element.style?.lineThickness ?? 4),
                 background: String(element.style?.background ?? element.style?.color ?? "#ffffff"),
               }}
