@@ -34,7 +34,7 @@ export const VisualLayer: React.FC<{
             <Img
               key={element.id}
               src={requireAsset(assets, element.assetId!, `visual element "${element.id}"`)}
-              style={{ ...base, objectFit: "contain" }}
+              style={{ ...base, objectFit: (element.style?.objectFit as React.CSSProperties["objectFit"]) ?? "contain" }}
             />
           );
         }
@@ -43,12 +43,12 @@ export const VisualLayer: React.FC<{
           const from = element.timelineStartFrame ?? 0;
           const end = element.timelineEndFrame ?? sceneDurationFrames;
           return <Sequence key={element.id} from={from} durationInFrames={end - from} layout="none">
-            <Video src={requireAsset(assets, element.assetId!, `video visual element "${element.id}"`)} startFrom={element.mediaStartFrame ?? 0} endAt={element.mediaEndFrame} style={{ ...base, objectFit: "cover" }} />
+            <Video src={requireAsset(assets, element.assetId!, `video visual element "${element.id}"`)} startFrom={element.mediaStartFrame ?? 0} endAt={element.mediaEndFrame} style={{ ...base, objectFit: (element.style?.objectFit as React.CSSProperties["objectFit"]) ?? "cover" }} />
           </Sequence>;
         }
 
         if (element.kind === "line") {
-          return <div key={element.id} style={{ ...base, height: Math.max(2, element.height), background: "currentColor" }} />;
+          return <div key={element.id} style={{ ...base, height: Number(element.style?.lineThickness ?? 4), background: String(element.style?.background ?? element.style?.color ?? "#ffffff") }} />;
         }
 
         if (element.kind === "shape") {
