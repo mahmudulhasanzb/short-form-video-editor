@@ -23,6 +23,7 @@ import { CaptionInspector } from "./CaptionInspector";
 import { SoundInspector } from "./SoundInspector";
 import { referencedAssetIds } from "./asset-utils";
 import { getTimelineFrameFromPosition } from "./timelineSeek";
+import { getVisualSequenceWarnings } from "@sfe/contracts";
 
 type Notice = { kind: "success" | "error"; message: string };
 
@@ -185,6 +186,10 @@ export default function App() {
   }
 
   const validation = plan ? scenePlanSchema.safeParse(plan) : null;
+  const visualSequenceWarnings = useMemo(
+    () => plan ? getVisualSequenceWarnings(plan.scenes) : [],
+    [plan],
+  );
 
   function seekTimeline(clientX: number, track: HTMLDivElement) {
     if (!plan) return;
@@ -260,6 +265,13 @@ export default function App() {
               {validation?.success ? "PLAN VALID" : "VALIDATION ERROR"}
             </div>
           </section>
+
+          {visualSequenceWarnings.length > 0 && (
+            <div className="notice sequence-warning" role="status">
+              <AlertCircle size={15} />
+              <span>{visualSequenceWarnings.length} adjacent scene pair(s) reuse the same visual structure: {visualSequenceWarnings.map((warning) => `${warning.previousSceneName} → ${warning.sceneName}`).join("; ")}. Review whether this repetition is intentional; keep it when it supports a clear progression or comparison.</span>
+            </div>
+          )}
 
           <section className="workspace">
             <aside className="scene-sidebar panel">
