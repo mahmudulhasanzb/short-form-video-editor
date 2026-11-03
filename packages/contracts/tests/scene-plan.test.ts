@@ -63,6 +63,71 @@ const validPlan = {
 };
 
 describe("scenePlanSchema", () => {
+  it("accepts editable visual element entrance and exit motion", () => {
+    const first = validPlan.scenes[0];
+    const result = scenePlanSchema.safeParse({
+      ...validPlan,
+      scenes: [{
+        ...first,
+        visual: {
+          type: "typography",
+          selectedAlternativeId: "alt-01",
+          alternatives: [{
+            id: "alt-01",
+            label: "Key phrase",
+            compositionType: "typography",
+            rationale: "A concise phrase emphasizes the spoken point.",
+            elements: [{
+              id: "headline",
+              kind: "text",
+              x: 10, y: 20, width: 80, height: 30, zIndex: 1,
+              text: "Key phrase",
+              motion: { enter: "rise", exit: "fade", delayFrames: 4, durationFrames: 12 },
+            }],
+          }],
+        },
+      }],
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.scenes[0]?.visual.alternatives[0]?.elements[0]?.motion).toEqual({
+        enter: "rise",
+        exit: "fade",
+        delayFrames: 4,
+        durationFrames: 12,
+      });
+    }
+  });
+
+  it("rejects visual element motion durations above 90 frames", () => {
+    const first = validPlan.scenes[0];
+    const result = scenePlanSchema.safeParse({
+      ...validPlan,
+      scenes: [{
+        ...first,
+        visual: {
+          type: "typography",
+          selectedAlternativeId: "alt-01",
+          alternatives: [{
+            id: "alt-01",
+            label: "Key phrase",
+            compositionType: "typography",
+            rationale: "A concise phrase emphasizes the spoken point.",
+            elements: [{
+              id: "headline",
+              kind: "text",
+              x: 10, y: 20, width: 80, height: 30, zIndex: 1,
+              text: "Key phrase",
+              motion: { enter: "rise", exit: "none", delayFrames: 0, durationFrames: 120 },
+            }],
+          }],
+        },
+      }],
+    });
+    expect(result.success).toBe(false);
+  });
+
+
   it("accepts a valid plan and applies documented defaults", () => {
     const parsed = scenePlanSchema.parse(validPlan);
 
