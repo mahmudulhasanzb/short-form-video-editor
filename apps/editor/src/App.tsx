@@ -452,35 +452,65 @@ export default function App() {
                                 </select>
                               </label>
                             )}
-                            <label className="field-label">CORNER RADIUS (PX)
-                              <input
-                                type="number"
-                                min={0}
-                                max={500}
-                                step={1}
-                                value={Number(style.borderRadius ?? 0)}
-                                onChange={(event) => {
-                                  if (event.target.value.trim() === "") return;
-                                  const radius = Math.max(0, Math.min(500, Number(event.target.value)));
-                                  if (!Number.isFinite(radius)) return;
-                                  updateVisualElement(selectedScene.id, selectedAlternative.id, element.id, { style: { ...style, borderRadius: radius } });
-                                }}
-                              />
-                            </label>
-                            <label className="field-label">BORDER (CSS)
-                              <input
-                                placeholder="2px solid #ffffff"
-                                value={String(style.border ?? "")}
-                                onChange={(event) => updateVisualElement(selectedScene.id, selectedAlternative.id, element.id, { style: { ...style, border: event.target.value } })}
-                              />
-                            </label>
-                            <label className="field-label">SHADOW (CSS)
-                              <input
-                                placeholder="0 8px 24px #00000055"
-                                value={String(style.boxShadow ?? "")}
-                                onChange={(event) => updateVisualElement(selectedScene.id, selectedAlternative.id, element.id, { style: { ...style, boxShadow: event.target.value } })}
-                              />
-                            </label>
+                            {(element.kind === "shape" || element.kind === "image" || element.kind === "video") && (
+                              <>
+                                <label className="field-label">CORNER RADIUS (PX)
+                                  <input
+                                    type="number"
+                                    min={0}
+                                    max={500}
+                                    step={1}
+                                    value={Number(style.borderRadius ?? 0)}
+                                    onChange={(event) => {
+                                      if (event.target.value.trim() === "") return;
+                                      const radius = Math.max(0, Math.min(500, Number(event.target.value)));
+                                      if (!Number.isFinite(radius)) return;
+                                      updateVisualElement(selectedScene.id, selectedAlternative.id, element.id, { style: { ...style, borderRadius: radius } });
+                                    }}
+                                  />
+                                </label>
+                                <label className="field-label">BORDER
+                                  <input
+                                    placeholder="2px solid #ffffff"
+                                    value={String(style.border ?? "")}
+                                    onChange={(event) => updateVisualElement(selectedScene.id, selectedAlternative.id, element.id, { style: { ...style, border: event.target.value } })}
+                                  />
+                                </label>
+                                <label className="field-label">SHADOW
+                                  <input
+                                    placeholder="0 8px 24px #00000055"
+                                    value={String(style.boxShadow ?? "")}
+                                    onChange={(event) => updateVisualElement(selectedScene.id, selectedAlternative.id, element.id, { style: { ...style, boxShadow: event.target.value } })}
+                                  />
+                                </label>
+                              </>
+                            )}
+                            {element.kind === "line" && (
+                              <>
+                                <label className="field-label">LINE COLOR
+                                  <input
+                                    type="color"
+                                    value={/^#[0-9a-fA-F]{6}$/.test(String(style.background ?? "#ffffff")) ? String(style.background ?? "#ffffff") : "#ffffff"}
+                                    onChange={(event) => updateVisualElement(selectedScene.id, selectedAlternative.id, element.id, { style: { ...style, background: event.target.value } })}
+                                  />
+                                </label>
+                                <label className="field-label">THICKNESS (PX)
+                                  <input
+                                    type="number"
+                                    min={1}
+                                    max={100}
+                                    step={1}
+                                    value={Number(style.lineThickness ?? 4)}
+                                    onChange={(event) => {
+                                      const raw = event.target.value;
+                                      if (raw.trim() === "") return;
+                                      const thickness = Math.max(1, Math.min(100, Number(raw)));
+                                      if (Number.isFinite(thickness)) updateVisualElement(selectedScene.id, selectedAlternative.id, element.id, { style: { ...style, lineThickness: thickness } });
+                                    }}
+                                  />
+                                </label>
+                              </>
+                            )}
                           </div>
                         );
                       })}
