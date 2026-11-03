@@ -1,6 +1,6 @@
 # Remotion renderer
 
-The renderer consumes the same validated scene-plan.json contract as the editor. It does not reconstruct scenes from HTML or keep a second plan format.
+The renderer consumes the same validated `scene-plan.json` contract as the editor. The editor's Remotion Player preview and the final render use the shared `VideoComposition`; the renderer does not reconstruct scenes from HTML or keep a second plan format.
 
 ## Asset manifest
 
@@ -14,23 +14,23 @@ Create an asset manifest JSON file in the per-video workspace. Keys are stable a
 }
 ~~~
 
-Search assets/sound-effects/ and assets/fonts/ in the repository before sourcing assets elsewhere. Select sound effects by audition, not filename. Check font licenses and verify that the renderer can load the chosen font. Missing references must stop rendering; never substitute a generic asset.
+Search `assets/sound-effects/` and `assets/fonts/` in the repository before sourcing assets elsewhere. Select sound effects by audition, not filename. Check font licenses and verify that the chosen font can actually be loaded by the renderer. The current renderer does not yet register or load custom font files; do not claim a local font is active in the final render until font loading is implemented and verified. Missing references must stop rendering; never substitute a generic asset.
 
 ## Render
 
 From the repository root:
 
 ~~~bash
-bun install
+bun install --frozen-lockfile
 bun --filter @sfe/renderer render -- <workspace>/planning/scene-plan.json <workspace>/assets/asset-manifest.json <workspace>/renders/final.mp4
 ~~~
 
-## Preview note
+## Preview
 
-The Remotion Studio shortcut is not exposed yet. The Studio needs a user-selected plan and workspace asset manifest, rather than fake default video data. Use the validated render CLI until the plan-loading preview bridge is implemented.
+The editor provides an interactive Remotion Player preview backed by the same `VideoComposition` used for export. Standalone Remotion Studio plan/workspace loading is not exposed as a separate shortcut.
 
 ## Current scope
 
-Implemented: scene sequencing, full-speaker / split / full-canvas layouts, selected visual elements, caption chunks, camera zoom/pan, per-element motion, and per-scene sound cues.
+Implemented: scene sequencing, full-speaker / split / full-canvas layouts, selected visual elements, caption chunks and supported caption animation, camera zoom/pan, speaker crop framing, per-element motion and styles, and per-scene sound cues.
 
-Not yet complete: precise source crop transform, background music/voice mix, custom transition system, font asset registration, editor-to-render preview parity tests, and render QC pipeline. The renderer remains a functional foundation; verify unsupported features instead of assuming they are available.
+Not yet complete: background music/voice mix, custom transition system, custom font asset registration, full editor-to-render visual parity coverage, and automated render QC. Verify unsupported features instead of assuming they are available.
