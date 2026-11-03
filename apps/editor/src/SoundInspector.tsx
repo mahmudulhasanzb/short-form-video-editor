@@ -36,9 +36,15 @@ export function SoundInspector({ scene, fps, assets, onChange, onAssetUpload }: 
     <div className="inspector-summary"><span>SOUND EFFECTS · {scene.soundEffects.length}</span><button type="button" className="small-button" onClick={addCue}>+ Add cue</button></div>
     {scene.soundEffects.map((effect, index) => <article className="sound-cue" key={effect.id}>
       <div className="chunk-heading"><strong>Cue {index + 1}</strong><label className="inline-toggle"><input type="checkbox" checked={effect.enabled} onChange={(e) => update(effect.id, { enabled: e.target.checked })}/> On</label></div>
+      <label className="field-label">AUDIO ASSET
+        <select value={effect.assetId} onChange={(e) => update(effect.id, { assetId: e.target.value })}>
+          <option value={effect.assetId}>{assets[effect.assetId] ? effect.assetId + " · attached" : effect.assetId + " · not attached"}</option>
+          {Object.keys(assets).filter((assetId) => assetId !== effect.assetId).map((assetId) => <option key={assetId} value={assetId}>{assetId}</option>)}
+        </select>
+      </label>
       <div className="asset-picker"><span>{assets[effect.assetId] ? "Audio attached" : "No audio attached"}</span>
         <input ref={(node) => { inputs.current[effect.id] = node; }} type="file" accept="audio/*" hidden onChange={(e) => { const file = e.target.files?.[0]; if (file) onAssetUpload(effect.assetId, file); e.target.value = ""; }}/>
-        <button type="button" className="small-button" onClick={() => inputs.current[effect.id]?.click()}>{assets[effect.assetId] ? "Replace" : "Attach audio"}</button>
+        <button type="button" className="small-button" onClick={() => inputs.current[effect.id]?.click()}>{assets[effect.assetId] ? "Replace audio" : "Attach audio"}</button>
       </div>
       {assets[effect.assetId] && <audio className="audio-audition" controls preload="metadata" src={assets[effect.assetId]}/>}
       <div className="chunk-timing">
