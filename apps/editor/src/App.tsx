@@ -22,6 +22,7 @@ import { PlanPreview } from "./PlanPreview";
 import { CaptionInspector } from "./CaptionInspector";
 import { SoundInspector } from "./SoundInspector";
 import { referencedAssetIds } from "./asset-utils";
+import { getTimelineFrameFromPosition } from "./timelineSeek";
 
 type Notice = { kind: "success" | "error"; message: string };
 
@@ -188,11 +189,12 @@ export default function App() {
   function seekTimeline(clientX: number, track: HTMLDivElement) {
     if (!plan) return;
     const bounds = track.getBoundingClientRect();
-    const position = Math.max(0, Math.min(1, (clientX - bounds.left) / bounds.width));
-    const nextFrame = Math.min(
-      plan.project.durationFrames - 1,
-      Math.floor(position * plan.project.durationFrames),
-    );
+    const nextFrame = getTimelineFrameFromPosition({
+      clientX,
+      trackLeft: bounds.left,
+      trackWidth: bounds.width,
+      durationFrames: plan.project.durationFrames,
+    });
     const scene = plan.scenes.find(
       (item) => nextFrame >= item.startFrame && nextFrame < item.endFrame,
     );
