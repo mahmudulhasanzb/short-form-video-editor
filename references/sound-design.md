@@ -40,7 +40,7 @@ If a named sound from an old rule has no matching file in these five folders, fo
 
 ## A1. The philosophy
 
-1. **Sound emphasizes motion.** Every sound you place exists to emphasize something the viewer can see: a movement, a pop, a change, a transition, or a build toward the next moment. If nothing is happening on screen, nothing happens in the sound.
+1. **Sound emphasizes meaningful events.** Every sound you place exists to emphasize a visible movement, reveal, state change, transition, or build. Silence is correct when the motion is minor, repeated, or does not benefit from sound.
 2. **Three jobs, three families.** Every sound in the library does exactly one of three jobs:
    - **Whooshes** → movement (slides, pans, zooms, camera moves, scene transitions)
    - **Textures** → things that happen without sliding (pops, clicks, reveals, write-outs, UI changes)
@@ -56,7 +56,7 @@ If a named sound from an old rule has no matching file in these five folders, fo
 
 ### Section 1 — WHOOSHES (movement)
 
-Use a whoosh any time something MOVES: text sliding up, down, or in from the side; an image sliding in; a UI element or chapter card sliding in (sliding, not popping); a camera pan; a camera zoom; a camera move inside an animation; a scene transition. Anytime there's a movement, there's a whoosh.
+Use a whoosh when movement materially changes focus or carries the viewer to a new idea: a significant camera pan/zoom, a major object travel, or a meaningful scene transition. Do not add a whoosh to every small text entrance or repeated UI movement. If adjacent beats use the same motion, avoid repeating the same cue unless it is an intentional motif.
 
 Placement rule: find the **fastest point of the movement** and align the **peak of the whoosh** to that exact frame. The whoosh should rise into the motion and tail out of it.
 
