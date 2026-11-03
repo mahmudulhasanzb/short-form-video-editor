@@ -16,6 +16,24 @@ import { getCameraTransform } from "./cameraMotion";
 
 type SceneData = ScenePlan["scenes"][number];
 
+export function getSpeakerFraming(
+  crop: SceneData["speakerCrop"],
+  camera: ReturnType<typeof getCameraTransform>,
+) {
+  const cropScale = crop
+    ? Math.max(100 / crop.width, 100 / crop.height)
+    : 1;
+  const objectPosition = crop
+    ? `${crop.x + crop.width / 2}% ${crop.y + crop.height / 2}%`
+    : "50% 50%";
+
+  return {
+    objectPosition,
+    transform: `scale(${cropScale * camera.scale}) translateX(${camera.translateX}%)`,
+    transformOrigin: "center center",
+  };
+}
+
 const SpeakerVideo: React.FC<{
   src: string;
   scene: SceneData;
@@ -24,14 +42,16 @@ const SpeakerVideo: React.FC<{
   const frame = useCurrentFrame();
   const duration = scene.endFrame - scene.startFrame;
   const camera = getCameraTransform(frame, duration, scene.cameraMotion);
-
-  const crop = scene.speakerCrop;
-  const objectPosition = crop
-    ? `${crop.x + crop.width / 2}% ${crop.y + crop.height / 2}%`
-    : "50% 50%";
+  const framing = getSpeakerFraming(scene.speakerCrop, camera);
 
   return (
-    <AbsoluteFill style={{ top: split ? "50%" : 0, height: split ? "50%" : "100%", overflow: "hidden" }}>
+    <AbsoluteFill
+      style={{
+        top: split ? "50%" : 0,
+        height: split ? "50%" : "100%",
+        overflow: "hidden",
+      }}
+    >
       <Video
         src={src}
         startFrom={scene.startFrame}
@@ -40,8 +60,7 @@ const SpeakerVideo: React.FC<{
           width: "100%",
           height: "100%",
           objectFit: "cover",
-          objectPosition,
-          transform: `scale(${camera.scale}) translateX(${camera.translateX}%)`,
+          ...framing,
         }}
       />
     </AbsoluteFill>
