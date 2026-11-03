@@ -25,9 +25,11 @@ For every supplied video asset, make a timestamped visual inventory before propo
 5. For each beat, write down the one thing the viewer should understand or feel.
 6. Choose the simplest visual form that communicates that idea: speaker-only, restrained typography, comparison, process diagram, timeline, relevant supplied image/object, genuine product/UI demonstration, or another justified composition.
 7. Choose Full Speaker, 50/50 Split, or Full Canvas only after the visual idea is clear.
-8. Compare supplied images/footage against transcript beats. Recommend placement only when the visible content is relevant; record the transcript evidence and intended screen treatment.
-9. Record source-media in/out in source frames separately from scene-relative overlay start/end frames. Source trim selects the excerpt; overlay timing determines when it appears. Verify exact boundaries by scrubbing. Never fill time with unrelated footage.
-10. Record uncertainty and missing source material explicitly. Do not invent facts, metrics, product interfaces, brands, or external assets.
+8. Give each useful visual a motion intention: primary entrance, optional stagger, readable hold, and optional exit. Use the structured element motion fields; vary direction and timing only when hierarchy or meaning calls for it. Stillness is valid.
+9. Identify sound only for meaningful visible events. Select a real library asset by audition and fit; do not auto-attach a repeated whoosh/click to every animation.
+10. Compare supplied images/footage against transcript beats. Recommend placement only when the visible content is relevant; record the transcript evidence and intended screen treatment.
+11. Record source-media in/out in source frames separately from scene-relative overlay start/end frames. Source trim selects the excerpt; overlay timing determines when it appears. Verify exact boundaries by scrubbing. Never fill time with unrelated footage.
+12. Record uncertainty and missing source material explicitly. Do not invent facts, metrics, product interfaces, brands, or external assets.
 
 ## Anti-template visual direction
 - Do not assign a UI card to every scene. Many beats should remain speaker-only or use restrained typography.
