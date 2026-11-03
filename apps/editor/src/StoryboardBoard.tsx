@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   AlertCircle, Check, ChevronDown, Download, Film, FileJson, ImagePlus,
   Layers3, Plus, Scissors, Trash2, Upload, Volume2, WandSparkles, X
@@ -18,6 +18,7 @@ type Props = {
   onPlanChange: (plan: ScenePlan) => void;
   onAttachAsset: (assetId: string, file: File) => void;
   onExportPlan: () => void;
+  onOpenPlan: () => void;
   notice: Notice | null;
   onDismissNotice: () => void;
 };
@@ -32,7 +33,7 @@ function makeId(prefix: string) {
   return prefix + "-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 7);
 }
 
-function Field({ label, children, hint }: { label: string; children: React.ReactNode; hint?: string }) {
+function Field({ label, children, hint }: { label: string; children: ReactNode; hint?: string }) {
   return <label className="sb-field"><span>{label}</span>{children}{hint ? <small>{hint}</small> : null}</label>;
 }
 
@@ -119,7 +120,7 @@ function SourceFrame({ url, scene, fps }: { url?: string; scene: Scene; fps: num
   </div>;
 }
 
-export function StoryboardBoard({ plan, assetUrls, onPlanChange, onAttachAsset, onExportPlan, notice, onDismissNotice }: Props) {
+export function StoryboardBoard({ plan, assetUrls, onPlanChange, onAttachAsset, onExportPlan, onOpenPlan, notice, onDismissNotice }: Props) {
   const fileInput = useRef<HTMLInputElement>(null);
   const [pendingAssetId, setPendingAssetId] = useState<string | null>(null);
   const [assetAccept, setAssetAccept] = useState("audio/*,image/*,video/*");
@@ -151,7 +152,6 @@ export function StoryboardBoard({ plan, assetUrls, onPlanChange, onAttachAsset, 
   }
   function addTextElement(sceneId: string, alternativeId: string) {
     const id = makeId("text");
-    updateElement(sceneId, alternativeId, "__new__", {} as Partial<Element>);
     mutateScene(sceneId, (scene) => ({ ...scene, visual: { ...scene.visual, alternatives: scene.visual.alternatives.map((alternative) =>
       alternative.id === alternativeId ? { ...alternative, elements: [...alternative.elements, {
         id, kind: "text", x: 8, y: 70, width: 84, height: 16, zIndex: 10, rotation: 0, opacity: 1,
@@ -218,6 +218,7 @@ export function StoryboardBoard({ plan, assetUrls, onPlanChange, onAttachAsset, 
       </a>
       <div className="sb-top-meta"><span className="sb-live-dot" /> {sceneCount} SCENES <i /> {plan.project.width} × {plan.project.height} <i /> {plan.project.fps} FPS</div>
       <div className="sb-actions">
+        <button className="sb-button secondary" onClick={onOpenPlan}><FileJson size={15} /> Open plan</button>
         <button className="sb-button secondary" onClick={() => openAssetPicker(plan.source.videoAssetId, "video/*")}><Upload size={15} /> {sourceUrl ? "Replace footage" : "Attach footage"}</button>
         <button className="sb-button primary" onClick={onExportPlan}><Download size={15} /> Save storyboard plan</button>
       </div>
