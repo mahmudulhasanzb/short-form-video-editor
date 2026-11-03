@@ -8,9 +8,9 @@
     "packages/*"
   ],
   "scripts": {
-    "typecheck": "bun run --filter '*' --if-present typecheck",
-    "test": "bun run --filter '*' --if-present test",
-    "build": "bun run --filter '*' --if-present build"
+    "typecheck": "bun --filter @sfe/contracts typecheck && bun --filter @sfe/renderer typecheck && bun --filter @sfe/editor typecheck",
+    "test": "bun --filter @sfe/contracts test && bun --filter @sfe/renderer test",
+    "build": "bun --filter @sfe/contracts build && bun --filter @sfe/editor build && bun --filter @sfe/renderer typecheck"
   },
   "devDependencies": {
     "typescript": "^5.8.3",
