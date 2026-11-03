@@ -15,7 +15,7 @@ Understand the cleaned video, transcript, and supplied visual assets before maki
 
 For every supplied video asset, make a timestamped visual inventory before proposing placements:
 
-1. Run the reusable footage inspector: python scripts/inspect_footage.py <video-path> --output <workspace>/footage-inspection/<asset-id>.
+1. Run the reusable footage inspector: `python scripts/inspect_footage.py <video-path> --output <workspace>/footage-inspection/<asset-id>`.
 2. Open the generated contact sheet and inspect the corresponding samples. Read footage.json for exact sample timestamps, duration, dimensions, and frame rate.
 3. If the sheet suggests a useful moment, scrub the original clip around that timestamp to verify the action and exact source in/out boundaries. A contact sheet is for discovery, not frame-accurate trimming.
 4. Record what is actually visible, the strongest usable time range, and any uncertainty. Do not infer unseen content from a filename.
@@ -24,7 +24,7 @@ For every supplied video asset, make a timestamped visual inventory before propo
 
 ## Process
 
-1. Confirm that the cleaned video passed verification.
+1. Confirm that the cleaned video passed verification. Also inspect the source and listen around proposed cut joins; the verifier is not a substitute for editorial review.
 2. Read the transcript and identify topic changes, key claims, examples, lists, contrasts, demonstrations, and emotional emphasis.
 3. Map every proposed scene to exact transcript evidence and project-timeline frame/time ranges.
 4. Inspect the corresponding speaker moments for framing, eye line, gestures, objects, and usable crop boundaries.
@@ -33,7 +33,7 @@ For every supplied video asset, make a timestamped visual inventory before propo
 7. Choose Full Speaker, 50/50 Split, or Full Canvas only after the visual idea is clear.
 8. Give each useful visual a motion intention: primary entrance, optional stagger, readable hold, and optional exit. Use structured element motion; vary direction and timing only when hierarchy or meaning calls for it. Stillness is valid.
 9. Identify sound only for meaningful visible events. Search assets/sound-effects/ first, audition relevant files, and choose by actual sound and fit. Do not auto-attach a repeated whoosh or click to every animation.
-10. Search assets/fonts/ before sourcing another font. Check the bundled license and verify that the selected font can actually be loaded by the renderer.
+10. Inspect assets/fonts/ and their license files before considering a local font. The current renderer uses the caption font-family CSS value but does not load/register font files from this directory. Do not plan a local font as active unless it is already available to the rendering environment or a verified font-loading method is provided.
 11. Compare supplied images and footage against transcript beats. Recommend placement only when the visible content is relevant; record transcript evidence and intended screen treatment.
 12. Record source-media in/out in source frames separately from scene-relative overlay start/end frames. Source trim selects the excerpt; overlay timing determines when it appears. Verify exact boundaries by scrubbing. Never fill time with unrelated footage.
 13. Record uncertainty and missing source material explicitly. Do not invent facts, metrics, product interfaces, brands, or external assets.
