@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "render": "tsx src/render.ts",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
     "@remotion/renderer": "4.0.539",

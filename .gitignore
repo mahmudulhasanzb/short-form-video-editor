@@ -1,4 +1,16 @@
 node_modules/
 **/node_modules/
 *.log
+*.tsbuildinfo
 .DS_Store
+
+# Generated build and test output
+**/dist/
+**/build/
+**/coverage/
+**/.vite/
+.turbo/
+
+# Generated video outputs should live in per-video workspaces, not the skill repo
+renders/
+rendered/

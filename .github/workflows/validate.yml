@@ -26,8 +26,8 @@ jobs:
       - name: Typecheck all packages
         run: bun run typecheck
 
-      - name: Run tests
+      - name: Run all package tests
         run: bun run test
 
-      - name: Build editor
-        run: bun --filter @sfe/editor build
+      - name: Build workspace packages
+        run: bun run build

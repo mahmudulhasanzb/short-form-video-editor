@@ -9,9 +9,9 @@ description: "Edits vertical talking-head videos into polished short-form videos
 
 Preserve these exact command names and meanings:
 
-- `/cutout-video`: prepare a cleaned video. Transcribe the source, create a reviewable cut list, cut with frame-accurate FFmpeg re-encoding, and verify the output. Stop after producing the cleaned video and its report.
-- `/make-video-edit-plan`: analyze the cleaned video and transcript, create a structured scene plan, validate it, and open the interactive editor for user review. Do not render the final video.
-- `/edit-video-auto`: orchestrate the complete workflow: preparation, planning, user review/editing, approval, rendering, and quality checks. Always stop for approval before final rendering.
+- **/cutout-video**: prepare a cleaned video. Transcribe the source, create a reviewable cut list, cut with frame-accurate FFmpeg re-encoding, and verify the output. Stop after producing the cleaned video and its report.
+- **/make-video-edit-plan**: analyze the cleaned video and transcript, create a structured scene plan, validate it, and open the interactive editor for user review. Do not render the final video.
+- **/edit-video-auto**: orchestrate the complete workflow: preparation, planning, user review/editing, approval, rendering, and quality checks. Always stop for approval before final rendering.
 
 ## Workspace safety
 
@@ -25,7 +25,7 @@ Preserve these exact command names and meanings:
 
 ## Core data rule
 
-The validated `scene-plan.json` is the single source of truth for the editor, preview, and renderer. Do not maintain separate hand-edited scene data for these components. Validate every plan against the shared contract before opening it in the editor or rendering it.
+The validated scene-plan.json is the single source of truth for the editor, preview, and renderer. Do not maintain separate hand-edited scene data for these components. Validate every plan against the shared contract before opening it in the editor or rendering it.
 
 ## Editing principles
 
@@ -36,29 +36,35 @@ The validated `scene-plan.json` is the single source of truth for the editor, pr
 - A 50/50 split requires a relevant graphic or source visual; captions alone do not justify it.
 - Offer genuinely different visual alternatives. Selecting an alternative must update the structured plan and preview.
 - Caption chunks default to approximately 3–4 words, while preserving natural speech and readable timing.
-- Allow word correction, split/merge, timing, highlighting, font, and animation edits.
+- Allow word correction, split/merge, timing, highlighting, font, and animation edits where the editor supports them.
 - Camera motion and sound effects must be independently editable per scene.
 - Unknown or unverifiable information must be flagged, not guessed.
+
+## Asset selection policy
+
+- **Fonts:** Search assets/fonts/ first. Inspect the actual font files and their bundled license terms before choosing one. Use a local font only when it fits the video and is permitted for the intended use. If no suitable local font exists, source an appropriately licensed external font and record its source and license. Fonts are not to be described as generated.
+- **Sound effects:** Search assets/sound-effects/ first. Audition relevant local candidates and choose by the actual sound, duration, texture, and fit—not by filename alone. If none fits, use an external or generated sound only when the required source/tool is available; record its provenance and license. Never invent a filename or silently substitute an unrelated sound.
+- Keep both local asset libraries intact. Do not delete, rename, or move their contents as part of routine editing.
 
 ## Quality gates
 
 - Cutting must use frame-accurate re-encoding; never use FFmpeg stream copy for edit decisions.
 - Verify cleaned-video frame rate, frame count, duration, and timestamp continuity before planning.
-- Validate scene ranges, captions, crop geometry, visual assets, and sound assets before rendering.
+- Validate scene ranges, captions, crop geometry, visual assets, fonts, and sound assets before rendering.
 - Test representative scenes and transitions before the full render.
 - Run final video and audio quality checks. A failed mandatory check means the render is not complete.
 
 ## Editing craft integration
 
-Read [Skill integration](references/skill-integration.md) for transcript-grounded visual decisions, non-repetitive motion, sound restraint, and QA rules. Use structured per-element motion only when it clarifies the beat; all motion remains editable in the scene plan.
+Read references/skill-integration.md for transcript-grounded visual decisions, non-repetitive motion, sound restraint, and QA rules. Use structured per-element motion only when it clarifies the beat; all motion remains editable in the scene plan.
 
 ## Workflows
 
 Read only the workflow needed for the requested command:
 
-- [Cutout workflow](workflows/cutout-video.md)
-- [Video analysis](workflows/analyze-video.md)
-- [Editing plan](workflows/create-editing-plan.md)
-- [Final rendering](workflows/render-final-video.md)
+- Cutout workflow: workflows/cutout-video.md
+- Video analysis: workflows/analyze-video.md
+- Editing plan: workflows/create-editing-plan.md
+- Final rendering: workflows/render-final-video.md
 
-Consult the root `references/` directory for detailed cutting, visual-direction, storyboard, and sound-design guidance. Treat reference frames as style guidance only; never copy their text, data, or scene content into a new video.
+Consult references/ for reusable cutting, visual-direction, and sound-design guidance. There is no required storyboard, example plan, or starter template. Treat any user-supplied reference material as inspiration for craft only; never copy its text, data, or scene content into a new video.

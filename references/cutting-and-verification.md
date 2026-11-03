@@ -1,87 +1,61 @@
-# Frame-Accurate Cutting and Timeline Verification Protocol
+# Cutting and Verification
 
-This document defines the cutting procedure and verification checks required before scene planning and rendering.
+This document describes reusable checks for preparing source footage and validating a final render. Use the actual source frame rate and the shared scene-plan contract; do not assume every video is 30 fps.
 
----
+## 1. Transcription and cut-list review
 
-## 1. Transcription & Segmentation
+1. Produce a word-timestamped transcript and retain the original transcript.
+2. Review fillers, false starts, repeated takes, long silences, and sentence boundaries in context.
+3. Create a cut list with source-time ranges and a reason for every proposed exclusion.
+4. Preserve the complete onset and offset of spoken words. Do not cut on a word boundary if it clips a consonant, breath, or natural speech transient.
+5. Preserve natural pauses where they support the speaker's cadence. Padding is allowed only into genuine silence, never into excluded speech or an adjacent kept segment.
+6. Review the proposed cut list before applying it. Do not infer that every pause or filler should be removed.
 
-1. **Local Whisper Transcription**:
-   - Run local Whisper (e.g. `whisper-timestamped` or `openai-whisper`) on raw audio.
-   - Extract precise word-level start and end timestamps.
-   - Output `<video-folder>/transcript.json`.
+## 2. Frame-accurate cutting
 
-2. **Script Understanding & Cut-List Construction**:
-   - Parse transcript to isolate:
-     - Spoken filler words (`um`, `uh`, `like`, repeated stutters).
-     - Unnatural dead air and silence exceeding 0.4 seconds.
-     - False starts, aborted sentences, retakes, and stuttered loops.
-   - Generate `<video-folder>/cut-list.json` containing:
-     - `keptSegments`: Array of `{ start: number, end: number, text: string }`.
-     - `excludedSegments`: Array of `{ start: number, end: number, text: string, reason: string }`.
+- Use frame-accurate FFmpeg re-encoding for editorial cuts. Never use stream copy (-c copy) to make precise cuts.
+- Use the source's actual frame rate and dimensions unless the user or delivery specification requires a conversion.
+- Keep video and audio trims aligned. Use short audio fades at joins only when needed to prevent clicks; verify that they do not clip speech.
+- Keep the raw source unchanged and write the cleaned output and cut-list artifacts into the video's workspace.
 
----
+## 3. Cleaned-video verification
 
-## 2. Frame-Accurate Cutting & Breath Rule
+Run the reusable verifier after cutting:
 
-### 2.1 Re-encoding Standard (Never Stream Copy)
-- Cutting must ALWAYS use frame-accurate re-encoding.
-- NEVER use stream copy (`-c copy`). Stream copy cuts at nearest keyframes, causing broken frames, desynced audio, and dropped words.
-- Cut each kept segment by exact timestamps at native source fps and resolution.
-- Encoding format: Video with `libx264` (CRF 18-20, preset medium/slow), Audio with `aac` (192kbps+).
-- Use FFmpeg trim and concat filtergraph or per-segment re-encode concatenated with re-encode.
+~~~bash
+python scripts/verify_cleaned.py --video <cleaned-video-path> --cut-list <cut-list-path>
+~~~
 
-### 2.2 The Breath Rule
-1. **Never Cut Exactly on Word Boundaries**:
-   - Raw Whisper word boundaries clip speech transients.
-   - Check segment edges: If a boundary cuts into a word (starts after word onset or ends before word offset), extend boundary to the complete word first.
-2. **Padding into Dead Air Only**:
-   - Expand each kept segment start by up to 0.20s and end by up to 0.20s into silence.
-   - NEVER pad into excluded speech (filler words, aborted takes, false starts).
-   - NEVER allow padding to overlap adjacent kept segments.
-3. **Natural Pauses (0.20s - 0.30s)**:
-   - Do NOT delete the entire dead-air gap between thoughts.
-   - Preserve 0.20 to 0.30 seconds of original room tone / pause in the cleaned timeline between sentences for human breathing cadence.
-4. **Click Prevention**:
-   - Apply a 25-millisecond audio fade-in and fade-out at each join point to prevent audio clicks and popping artifacts.
+Check:
 
----
+- Video and audio streams are present and decodable.
+- Actual decoded frame count is consistent with the reported duration and frame rate.
+- Frame rate matches the intended timeline and has not changed unexpectedly.
+- The output duration is consistent with the kept segments and any documented padding.
+- Presentation timestamps remain monotonic across joins.
+- Audio is continuous, synchronized, and free of obvious clicks or clipped words.
 
-## 3. Mandatory Cutting Verification (Pre-Planning Gate)
+If a mandatory check fails, stop before planning and report expected versus actual values. Do not label an unverified file as cleaned.
 
-Immediately after generating `cleaned.mp4`, run `verify_cleaned.py` (or execute `ffprobe` checks) against `cut-list.json`:
+## 4. Render verification
 
-1. **FPS Check**:
-   - Inspect average frame rate (`r_frame_rate`, `avg_frame_rate`).
-   - Must strictly match native source FPS (e.g., 30.000 or 29.970).
-2. **Frame Count Check**:
-   - Total frames must equal `duration * fps` within ±1 frame.
-3. **Padded Duration Match**:
-   - Cleaned duration must match the calculated sum of padded kept segments in `cut-list.json`.
-4. **Timestamp Continuity**:
-   - Analyze presentation timestamps (PTS). Zero timestamp collapse, zero backwards steps, and zero non-monotonic jumps across joins.
+Before the full render, render a representative test that covers the project's actual layouts, captions, motion, and sound cues. Inspect it and fix any problems before rendering the full composition. Do not require a fixed scene number or a specific set of layouts if the project does not use them.
 
-> [!CRITICAL]
-> If any cutting verification check fails, STOP immediately. Report the exact numbers (expected vs actual fps, frame count, duration, PTS jumps) to the user. Do not proceed to scene planning.
+For split scenes, inspect entry, middle, and exit frames to confirm that the speaker's head, eyes, mouth, and chin remain visible in the speaker region. Check caption placement and clipping at phone size.
 
----
+After the full render, run:
 
-## 4. Final Render Verification & Audio QC Gate
+~~~bash
+python scripts/verify_render.py --video <final-video-path>
+~~~
 
-Before any render is declared complete or ready for delivery, the following gates must be satisfied:
+Also inspect:
 
-### 4.1 Visual Verification Stages
-1. **Stage 1 (Test Clip)**: Render scenes 1 to 2 only. Extract proof frames. Verify layout, caption sync, typography, and card motion. STOP.
-2. **Stage 2 (Key Scene Verification)**: Render key transitional scenes (Hook, first 50/50 Split, first 100% Full Canvas, Ending CTA). Extract proof frames. Verify speaker framing and card lifespans. STOP.
-3. **Stage 3 (Full Video Render)**: Render the entire video only after stages 1 and 2 pass.
+- Resolution, frame rate, frame count, duration, and audio stream.
+- Caption timing, text clipping, scene boundaries, and source-video synchronization.
+- Crop geometry, unexpected blank frames, and preview/render consistency.
+- Dialogue intelligibility, SFX/music balance, clipping, abrupt tails, and unintended silence.
 
-### 4.2 Split-Face Framing Proof
-- For every 50/50 Split scene, inspect at least 3 frames (entry, middle, exit).
-- Verify: Head top, eye line, mouth, and chin are 100% visible inside the bottom 50% Layer B container with chin clearance and shoulders visible. No facial clipping allowed.
+Use scripts/check_audio_levels.py as an additional diagnostic when a clean voice track is available. Loudness and peak targets depend on the delivery specification; do not treat one fixed LUFS or dB value as universal unless the user or platform requires it.
 
-### 4.3 Audio QC Numbers Standard
-Audio cannot be approved by casual observation; quantitative metrics are mandatory via FFmpeg `volumedetect` and `loudnorm`:
-1. **Dialogue Loudness**: Integrated loudness between -14 LUFS and -16 LUFS.
-2. **True Peak**: Must never exceed -1.0 dBTP.
-3. **Voice Dominance**: Dialogue must be louder than all SFX and music at every second.
-4. **RMS Difference**: Sound effects must not elevate quiet speech segments by more than +6 dB RMS.
+A render is complete only after required checks pass and remaining warnings are reported honestly.

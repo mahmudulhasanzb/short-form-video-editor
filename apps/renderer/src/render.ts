@@ -17,7 +17,7 @@ async function main() {
   const [planPath, assetManifestPath, outputPath] = process.argv.slice(2);
   if (!planPath || !assetManifestPath || !outputPath) {
     throw new Error(
-      "Usage: pnpm --filter @sfe/renderer render -- <scene-plan.json> <asset-manifest.json> <output.mp4>",
+      "Usage: bun --filter @sfe/renderer render -- <scene-plan.json> <asset-manifest.json> <output.mp4>",
     );
   }
 
