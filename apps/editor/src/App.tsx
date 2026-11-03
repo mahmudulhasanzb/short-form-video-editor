@@ -628,7 +628,7 @@ export default function App() {
                   {selectedScene.cameraMotion.enabled && (
                     <>
                       <label className="field-label">MOTION TYPE<select value={selectedScene.cameraMotion.type ?? "zoom-in"} onChange={(event) => updateScene(selectedScene.id, (scene) => ({ ...scene, cameraMotion: { ...scene.cameraMotion, type: event.target.value as NonNullable<typeof scene.cameraMotion.type> } }))}><option value="zoom-in">Zoom In</option><option value="zoom-out">Zoom Out</option><option value="pan-left">Pan Left</option><option value="pan-right">Pan Right</option></select></label>
-                      <label className="field-label">INTENSITY · {Math.round(selectedScene.cameraMotion.intensity * 100)}%<input type="range" min="0" max="1" step="0.05" value={selectedScene.cameraMotion.intensity} onChange={(event) => updateScene(selectedScene.id, (scene) => ({ ...scene, cameraMotion: { ...scene.cameraMotion, intensity: Number(event.target.value) } }))} /></label>
+                      <label className="field-label">INTENSITY · {Math.round(selectedScene.cameraMotion.intensity * 100)}% (max 12% zoom / 4% pan)<input type="range" min="0" max="1" step="0.05" value={selectedScene.cameraMotion.intensity} onChange={(event) => updateScene(selectedScene.id, (scene) => ({ ...scene, cameraMotion: { ...scene.cameraMotion, intensity: Number(event.target.value) } }))} /></label>
                     </>
                   )}
 
