@@ -44,7 +44,7 @@ function NumberInput({ value, min, max, step = 1, onChange }: {
     onChange={(event) => { if (event.target.value !== "") onChange(Number(event.target.value)); }} />;
 }
 
-function SourceFrame({ url, scene, fps }: { url?: string; scene: Scene; fps: number }) {
+function SourceFrame({ url, scene, fps }: { url?: string | undefined; scene: Scene; fps: number }) {
   const [still, setStill] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
   useEffect(() => {
