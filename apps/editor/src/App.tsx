@@ -417,6 +417,16 @@ export default function App() {
                           updateVisualElement(selectedScene.id, selectedAlternative.id, element.id, { [key]: next });
                         };
                         const style = (element.style ?? {}) as Record<string, unknown>;
+                        const motion = element.motion ?? {
+                          enter: "none" as const,
+                          exit: "none" as const,
+                          delayFrames: 0,
+                          durationFrames: 12,
+                        };
+                        const updateMotion = (patch: Partial<typeof motion>) =>
+                          updateVisualElement(selectedScene.id, selectedAlternative.id, element.id, {
+                            motion: { ...motion, ...patch },
+                          });
                         return (
                           <div className="alternative-card" key={element.id}>
                             <strong>{element.id} · {element.kind.toUpperCase()}</strong>
@@ -451,6 +461,36 @@ export default function App() {
                                 />
                               </label>
                             )}
+                            <div className="section-divider" />
+                            <div className="field-label">ELEMENT MOTION</div>
+                            <div className="field-grid">
+                              <label className="field-label">ENTRANCE
+                                <select value={motion.enter} onChange={(event) => updateMotion({ enter: event.target.value as typeof motion.enter })}>
+                                  <option value="none">None</option>
+                                  <option value="fade">Fade</option>
+                                  <option value="rise">Rise</option>
+                                  <option value="slide-left">Slide from left</option>
+                                  <option value="slide-right">Slide from right</option>
+                                  <option value="scale">Scale</option>
+                                  <option value="pop">Pop</option>
+                                </select>
+                              </label>
+                              <label className="field-label">EXIT
+                                <select value={motion.exit} onChange={(event) => updateMotion({ exit: event.target.value as typeof motion.exit })}>
+                                  <option value="none">None</option>
+                                  <option value="fade">Fade</option>
+                                  <option value="drop">Drop + fade</option>
+                                </select>
+                              </label>
+                            </div>
+                            <div className="field-grid">
+                              <label className="field-label">DELAY (FRAMES)
+                                <input type="number" min={0} max={300} value={motion.delayFrames} onChange={(event) => updateMotion({ delayFrames: Math.max(0, Number(event.target.value) || 0) })} />
+                              </label>
+                              <label className="field-label">DURATION (FRAMES)
+                                <input type="number" min={1} max={90} value={motion.durationFrames} onChange={(event) => updateMotion({ durationFrames: Math.max(1, Math.min(90, Number(event.target.value) || 1)) })} />
+                              </label>
+                            </div>
                             <div className="section-divider" />
                             <div className="field-label">ELEMENT STYLE</div>
                             {(element.kind === "image" || element.kind === "icon" || element.kind === "video") && (
