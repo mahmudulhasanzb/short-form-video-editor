@@ -12,6 +12,7 @@ import type { RenderInputProps } from "./types";
 import { requireAsset } from "./types";
 import { VisualLayer } from "./VisualLayer";
 import { CaptionLayer } from "./CaptionLayer";
+import { getSoundCueTiming } from "./soundCueTiming";
 
 type SceneData = ScenePlan["scenes"][number];
 
@@ -78,19 +79,30 @@ export const Scene: React.FC<{
         </AbsoluteFill>
       )}
       <CaptionLayer scene={scene} />
-      {scene.soundEffects.filter((effect) => effect.enabled).map((effect) => (
-        <Sequence
-          key={effect.id}
-          from={effect.startFrame - scene.startFrame}
-          durationInFrames={effect.durationFrames}
-          layout="none"
-        >
-          <Audio
-            src={requireAsset(input.assets, effect.assetId, `sound effect "${effect.id}"`)}
-            volume={Math.pow(10, effect.volumeDb / 20)}
-          />
-        </Sequence>
-      ))}
+      {scene.soundEffects.filter((effect) => effect.enabled).map((effect) => {
+        const timing = getSoundCueTiming({
+          sceneStartFrame: scene.startFrame,
+          sceneEndFrame: scene.endFrame,
+          cueStartFrame: effect.startFrame,
+          cueDurationFrames: effect.durationFrames,
+          volumeDb: effect.volumeDb,
+        });
+        if (!timing) return null;
+
+        return (
+          <Sequence
+            key={effect.id}
+            from={timing.from}
+            durationInFrames={timing.durationInFrames}
+            layout="none"
+          >
+            <Audio
+              src={requireAsset(input.assets, effect.assetId, `sound effect "${effect.id}"`)}
+              volume={timing.volume}
+            />
+          </Sequence>
+        );
+      })}
     </AbsoluteFill>
   );
 };
