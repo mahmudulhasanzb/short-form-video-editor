@@ -31,28 +31,28 @@ The validated scene-plan.json is the single source of truth for the editor, prev
 
 - Ground every visual decision in the current video's transcript or a user-provided source asset.
 - Never invent facts, numbers, product interfaces, URLs, sound filenames, or image sources.
-- Keep voice intelligible and dominant over music and effects.
+- Keep voice intelligible and dominant over sound effects.
 - Use Full Speaker, 50/50 Split, and Full Canvas only when the visual content justifies the layout.
 - A 50/50 split requires a relevant graphic or source visual; captions alone do not justify it.
 - Offer genuinely different visual alternatives. Selecting an alternative must update the structured plan and preview.
 - Caption chunks default to approximately 3–4 words, while preserving natural speech and readable timing.
-- Allow word correction, split/merge, timing, highlighting, font, and animation edits where the editor supports them.
+- Allow word correction, split/merge, timing, highlighting, font-family styling, and animation edits where the editor supports them.
 - Camera motion and sound effects must be independently editable per scene.
 - Unknown or unverifiable information must be flagged, not guessed.
 
 ## Asset selection policy
 
-- **Fonts:** Search assets/fonts/ first. Inspect the actual font files and their bundled license terms before choosing one. Use a local font only when it fits the video and is permitted for the intended use. If no suitable local font exists, source an appropriately licensed external font and record its source and license. Fonts are not to be described as generated.
+- **Fonts:** Search assets/fonts/ first and inspect the actual files and bundled license terms. The current renderer applies the caption font-family CSS setting but does not register or bundle local font files. A local font file is not usable merely because it exists in the library. Use only a font already available to the rendering environment, or source/prepare a permitted font only when a supported loading method is available. Record source and license. Do not claim a local font is active unless it has been loaded and verified.
 - **Sound effects:** Search assets/sound-effects/ first. Audition relevant local candidates and choose by the actual sound, duration, texture, and fit—not by filename alone. If none fits, use an external or generated sound only when the required source/tool is available; record its provenance and license. Never invent a filename or silently substitute an unrelated sound.
 - Keep both local asset libraries intact. Do not delete, rename, or move their contents as part of routine editing.
 
 ## Quality gates
 
 - Cutting must use frame-accurate re-encoding; never use FFmpeg stream copy for edit decisions.
-- Verify cleaned-video frame rate, frame count, duration, and timestamp continuity before planning.
-- Validate scene ranges, captions, crop geometry, visual assets, fonts, and sound assets before rendering.
+- Run the cleaned-video verifier and inspect its report. Treat it as a technical diagnostic, not proof of audio continuity or word-safe cuts; listen to joins and inspect the actual footage.
+- Validate scene ranges, captions, crop geometry, visual assets, supported font choices, and sound assets before rendering.
 - Test representative scenes and transitions before the full render.
-- Run final video and audio quality checks. A failed mandatory check means the render is not complete.
+- Run final video and audio quality checks. Pass target resolution and frame rate explicitly when they differ from the verifier defaults. A failed mandatory check means the render is not complete.
 
 ## Editing craft integration
 
