@@ -4,7 +4,6 @@ import {
   Audio,
   Sequence,
   Video,
-  interpolate,
   useCurrentFrame,
 } from "remotion";
 import type { ScenePlan } from "@sfe/contracts";
@@ -13,6 +12,7 @@ import { requireAsset } from "./types";
 import { VisualLayer } from "./VisualLayer";
 import { CaptionLayer } from "./CaptionLayer";
 import { getSoundCueTiming } from "./soundCueTiming";
+import { getCameraTransform } from "./cameraMotion";
 
 type SceneData = ScenePlan["scenes"][number];
 
@@ -23,18 +23,7 @@ const SpeakerVideo: React.FC<{
 }> = ({ src, scene, split }) => {
   const frame = useCurrentFrame();
   const duration = scene.endFrame - scene.startFrame;
-  const intensity = scene.cameraMotion.intensity;
-  const motion = scene.cameraMotion.enabled ? scene.cameraMotion.type : null;
-  const zoom = motion === "zoom-in"
-    ? interpolate(frame, [0, Math.max(1, duration - 1)], [1, 1 + intensity], { extrapolateRight: "clamp" })
-    : motion === "zoom-out"
-      ? interpolate(frame, [0, Math.max(1, duration - 1)], [1 + intensity, 1], { extrapolateRight: "clamp" })
-      : 1;
-  const pan = motion === "pan-left"
-    ? interpolate(frame, [0, Math.max(1, duration - 1)], [2, -2], { extrapolateRight: "clamp" })
-    : motion === "pan-right"
-      ? interpolate(frame, [0, Math.max(1, duration - 1)], [-2, 2], { extrapolateRight: "clamp" })
-      : 0;
+  const camera = getCameraTransform(frame, duration, scene.cameraMotion);
 
   const crop = scene.speakerCrop;
   const objectPosition = crop
@@ -52,7 +41,7 @@ const SpeakerVideo: React.FC<{
           height: "100%",
           objectFit: "cover",
           objectPosition,
-          transform: `scale(${zoom}) translateX(${pan}%)`,
+          transform: `scale(${camera.scale}) translateX(${camera.translateX}%)`,
         }}
       />
     </AbsoluteFill>
