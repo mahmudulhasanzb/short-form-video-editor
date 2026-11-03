@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import type { ScenePlan } from "@sfe/contracts";
 
 type Scene = ScenePlan["scenes"][number];
@@ -12,6 +12,14 @@ export function SoundInspector({ scene, fps, assets, onChange, onAssetUpload }: 
   onAssetUpload: (assetId: string, file: File) => void;
 }) {
   const inputs = useRef<Record<string, HTMLInputElement | null>>({});
+  const audioPlayers = useRef<Record<string, HTMLAudioElement | null>>({});
+
+  useEffect(() => {
+    for (const effect of scene.soundEffects) {
+      const player = audioPlayers.current[effect.id];
+      if (player) player.volume = Math.max(0, Math.min(1, Math.pow(10, effect.volumeDb / 20)));
+    }
+  }, [scene.soundEffects]);
   const update = (id: string, patch: Partial<SoundEffect>) => onChange(scene.soundEffects.map((effect) => effect.id === id ? { ...effect, ...patch } : effect));
   const updateTiming = (effect: SoundEffect, field: "startFrame" | "durationFrames", value: number) => {
     if (field === "startFrame") {
@@ -46,7 +54,7 @@ export function SoundInspector({ scene, fps, assets, onChange, onAssetUpload }: 
         <input ref={(node) => { inputs.current[effect.id] = node; }} type="file" accept="audio/*" hidden onChange={(e) => { const file = e.target.files?.[0]; if (file) onAssetUpload(effect.assetId, file); e.target.value = ""; }}/>
         <button type="button" className="small-button" onClick={() => inputs.current[effect.id]?.click()}>{assets[effect.assetId] ? "Replace audio" : "Attach audio"}</button>
       </div>
-      {assets[effect.assetId] && <audio className="audio-audition" controls preload="metadata" src={assets[effect.assetId]}/>}
+      {assets[effect.assetId] && <audio ref={(player) => { audioPlayers.current[effect.id] = player; if (player) player.volume = Math.max(0, Math.min(1, Math.pow(10, effect.volumeDb / 20))); }} className="audio-audition" controls preload="metadata" src={assets[effect.assetId]}/>}
       <div className="chunk-timing">
         <label>START FRAME<input type="number" min={scene.startFrame} max={scene.endFrame - 1} value={effect.startFrame} onChange={(e) => updateTiming(effect, "startFrame", Number(e.target.value))}/></label>
         <label>DURATION<input type="number" min={1} max={scene.endFrame - effect.startFrame} value={effect.durationFrames} onChange={(e) => updateTiming(effect, "durationFrames", Number(e.target.value))}/></label>
