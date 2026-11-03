@@ -1,9 +1,8 @@
 import React from "react";
 import { Composition } from "remotion";
 import { scenePlanSchema } from "@sfe/contracts";
-import { VideoComposition } from "./VideoComposition";
+import { VideoComposition, getCompositionMetadata } from "./VideoComposition";
 import type { RenderInputProps } from "./types";
-import { validateRenderAssets } from "./types";
 
 const emptyProps = {
   plan: {
@@ -26,12 +25,7 @@ export const RemotionRoot: React.FC = () => (
     defaultProps={emptyProps}
     calculateMetadata={({ props }) => {
       const plan = scenePlanSchema.parse(props.plan);
-      return {
-        width: plan.project.width,
-        height: plan.project.height,
-        fps: plan.project.fps,
-        durationInFrames: plan.project.durationFrames,
-      };
+      return getCompositionMetadata(plan);
     }}
   />
 );
