@@ -20,7 +20,8 @@ describe("caption animation timing", () => {
     expect(getCaptionAnimationState("word-pop", 0, 20, 0).wordOpacity).toBe(0);
     expect(getCaptionAnimationState("word-pop", 2, 20, 1).wordOpacity).toBe(0);
     expect(getCaptionAnimationState("word-pop", 5, 20, 1).wordOpacity).toBe(1);
-    expect(getCaptionAnimationState("word-pop", 5, 20, 1).scale).toBe(1);
+    expect(getCaptionAnimationState("word-pop", 5, 20, 1).scale).toBeCloseTo(0.93);
+    expect(getCaptionAnimationState("word-pop", 6, 20, 1).scale).toBe(1);
   });
 
   it("keeps the none animation static", () => {
