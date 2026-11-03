@@ -48,6 +48,10 @@ The validated `scene-plan.json` is the single source of truth for the editor, pr
 - Test representative scenes and transitions before the full render.
 - Run final video and audio quality checks. A failed mandatory check means the render is not complete.
 
+## Editing craft integration
+
+Read [Skill integration](references/skill-integration.md) for transcript-grounded visual decisions, non-repetitive motion, sound restraint, and QA rules. Use structured per-element motion only when it clarifies the beat; all motion remains editable in the scene plan.
+
 ## Workflows
 
 Read only the workflow needed for the requested command:
