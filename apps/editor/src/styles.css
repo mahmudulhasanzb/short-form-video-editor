@@ -48,3 +48,5 @@ button{cursor:pointer}
 .audio-audition{width:100%;height:28px}
 .volume-field input{width:100%;accent-color:#8876e5}
 @media(max-width:1100px){.caption-style-grid{grid-template-columns:1fr}.workspace{grid-template-columns:200px minmax(300px,1fr) 260px}}
+
+.notice.sequence-warning{background:#302b20;border:1px solid #65532d;color:#ead39a;line-height:1.5;align-items:flex-start}
