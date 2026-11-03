@@ -437,6 +437,50 @@ export default function App() {
                                 />
                               </label>
                             )}
+                            <div className="section-divider" />
+                            <div className="field-label">ELEMENT STYLE</div>
+                            {(element.kind === "image" || element.kind === "icon" || element.kind === "video") && (
+                              <label className="field-label">FIT
+                                <select
+                                  value={String(style.objectFit ?? (element.kind === "video" ? "cover" : "contain"))}
+                                  onChange={(event) => updateVisualElement(selectedScene.id, selectedAlternative.id, element.id, { style: { ...style, objectFit: event.target.value } })}
+                                >
+                                  <option value="contain">Contain</option>
+                                  <option value="cover">Cover</option>
+                                  <option value="fill">Stretch</option>
+                                  <option value="none">Original size</option>
+                                </select>
+                              </label>
+                            )}
+                            <label className="field-label">CORNER RADIUS (PX)
+                              <input
+                                type="number"
+                                min={0}
+                                max={500}
+                                step={1}
+                                value={Number(style.borderRadius ?? 0)}
+                                onChange={(event) => {
+                                  if (event.target.value.trim() === "") return;
+                                  const radius = Math.max(0, Math.min(500, Number(event.target.value)));
+                                  if (!Number.isFinite(radius)) return;
+                                  updateVisualElement(selectedScene.id, selectedAlternative.id, element.id, { style: { ...style, borderRadius: radius } });
+                                }}
+                              />
+                            </label>
+                            <label className="field-label">BORDER (CSS)
+                              <input
+                                placeholder="2px solid #ffffff"
+                                value={String(style.border ?? "")}
+                                onChange={(event) => updateVisualElement(selectedScene.id, selectedAlternative.id, element.id, { style: { ...style, border: event.target.value } })}
+                              />
+                            </label>
+                            <label className="field-label">SHADOW (CSS)
+                              <input
+                                placeholder="0 8px 24px #00000055"
+                                value={String(style.boxShadow ?? "")}
+                                onChange={(event) => updateVisualElement(selectedScene.id, selectedAlternative.id, element.id, { style: { ...style, boxShadow: event.target.value } })}
+                              />
+                            </label>
                           </div>
                         );
                       })}
