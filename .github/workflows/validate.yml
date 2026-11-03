@@ -26,8 +26,8 @@ jobs:
       - name: Typecheck all packages
         run: bun run typecheck
 
-      - name: Run all package tests
+      - name: Run contracts and renderer tests
         run: bun run test
 
-      - name: Build workspace packages
+      - name: Build contracts and editor; validate renderer
         run: bun run build
