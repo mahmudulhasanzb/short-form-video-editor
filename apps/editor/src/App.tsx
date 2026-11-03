@@ -23,7 +23,7 @@ import { CaptionInspector } from "./CaptionInspector";
 import { SoundInspector } from "./SoundInspector";
 import { referencedAssetIds } from "./asset-utils";
 import { getTimelineFrameFromPosition } from "./timelineSeek";
-import { getVisualSequenceWarnings } from "@sfe/contracts";
+import { getVisualSequenceWarnings, getRepeatedSoundCueWarnings } from "@sfe/contracts";
 
 type Notice = { kind: "success" | "error"; message: string };
 
@@ -190,6 +190,10 @@ export default function App() {
     () => plan ? getVisualSequenceWarnings(plan.scenes) : [],
     [plan],
   );
+  const repeatedSoundWarnings = useMemo(
+    () => plan ? getRepeatedSoundCueWarnings(plan.scenes) : [],
+    [plan],
+  );
 
   function seekTimeline(clientX: number, track: HTMLDivElement) {
     if (!plan) return;
@@ -270,6 +274,13 @@ export default function App() {
             <div className="notice sequence-warning" role="status">
               <AlertCircle size={15} />
               <span>{visualSequenceWarnings.length} adjacent scene pair(s) reuse the same visual structure: {visualSequenceWarnings.map((warning) => `${warning.previousSceneName} → ${warning.sceneName}`).join("; ")}. Review whether this repetition is intentional; keep it when it supports a clear progression or comparison.</span>
+            </div>
+          )}
+
+          {repeatedSoundWarnings.length > 0 && (
+            <div className="notice sequence-warning" role="status">
+              <AlertCircle size={15} />
+              <span>{repeatedSoundWarnings.length} adjacent scene pair(s) reuse the same enabled sound asset: {repeatedSoundWarnings.map((warning) => `${warning.previousSceneName} → ${warning.sceneName} (${warning.assetIds.join(", ")})`).join("; ")}. Audition the cue and keep repetition only when it is intentional.</span>
             </div>
           )}
 
