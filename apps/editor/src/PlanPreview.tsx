@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { Player, type CallbackListener, type PlayerRef } from "@remotion/player";
 import type { ScenePlan } from "@sfe/contracts";
-import { VideoComposition } from "../../renderer/src/VideoComposition";
+import { VideoComposition, getCompositionMetadata } from "../../renderer/src/VideoComposition";
 import type { RenderInputProps } from "../../renderer/src/types";
 
 export function PlanPreview({ plan, assets, frame, onFrameChange, playerRef, onPlaybackStateChange }: {
@@ -14,6 +14,7 @@ export function PlanPreview({ plan, assets, frame, onFrameChange, playerRef, onP
 }) {
   const currentFrameRef = useRef(frame);
   const inputProps: RenderInputProps = { plan, assets };
+  const metadata = getCompositionMetadata(plan);
 
   useEffect(() => {
     const player = playerRef.current;
@@ -51,10 +52,10 @@ export function PlanPreview({ plan, assets, frame, onFrameChange, playerRef, onP
     ref={playerRef}
     component={VideoComposition}
     inputProps={inputProps}
-    durationInFrames={plan.project.durationFrames}
-    compositionWidth={plan.project.width}
-    compositionHeight={plan.project.height}
-    fps={plan.project.fps}
+    durationInFrames={metadata.durationInFrames}
+    compositionWidth={metadata.width}
+    compositionHeight={metadata.height}
+    fps={metadata.fps}
     initialFrame={frame}
     moveToBeginningWhenEnded
     clickToPlay
