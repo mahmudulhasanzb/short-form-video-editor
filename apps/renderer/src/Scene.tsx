@@ -13,26 +13,10 @@ import { VisualLayer } from "./VisualLayer";
 import { CaptionLayer } from "./CaptionLayer";
 import { getSoundCueTiming } from "./soundCueTiming";
 import { getCameraTransform } from "./cameraMotion";
+import { getSpeakerFraming } from "./speakerFraming";
 
 type SceneData = ScenePlan["scenes"][number];
 
-export function getSpeakerFraming(
-  crop: SceneData["speakerCrop"],
-  camera: ReturnType<typeof getCameraTransform>,
-) {
-  const cropScale = crop
-    ? Math.max(100 / crop.width, 100 / crop.height)
-    : 1;
-  const objectPosition = crop
-    ? `${crop.x + crop.width / 2}% ${crop.y + crop.height / 2}%`
-    : "50% 50%";
-
-  return {
-    objectPosition,
-    transform: `scale(${cropScale * camera.scale}) translateX(${camera.translateX}%)`,
-    transformOrigin: "center center",
-  };
-}
 
 const SpeakerVideo: React.FC<{
   src: string;
