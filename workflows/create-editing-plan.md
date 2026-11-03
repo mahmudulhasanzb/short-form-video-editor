@@ -14,7 +14,9 @@ Create an editable, validated scene plan and open it in the interactive editor. 
 10. Save the validated `scene-plan.json` in the video's planning directory.
 11. Open the interactive editor using that exact plan.
 12. Wait for the user to review and edit the plan. Persist edits back to the same source-of-truth plan.
-13. Stop. Final rendering belongs to the approved render workflow.
+13. The review surface must be genuinely editable, not a static HTML mockup: expose every generated scene, caption chunk, visual element, camera-motion choice, and sound cue that can be changed. Controls must write to the structured scene plan and refresh the preview from that same data. Do not hardcode generated wording, timings, sound selections, animation choices, or per-scene zoom settings into presentation-only markup.
+14. Provide direct controls for caption text and split/merge, timing, highlight words, font/animation; per-scene zoom/motion on/off and settings; and sound cue selection/disable. Offer sensible defaults, but keep them changeable. If a choice is unsupported by the plan schema/editor, flag it as unsupported instead of displaying a fake/inert control.
+15. Stop. Final rendering belongs to the approved render workflow.
 
 ## Visual selection rules
 - Start with the idea, not the component library. Speaker-only is a valid and preferred choice when no supporting visual adds meaning.
