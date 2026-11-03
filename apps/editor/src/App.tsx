@@ -74,7 +74,9 @@ export default function App() {
     </main>;
   }
 
-  return <StoryboardBoard
+  return <>
+    <input ref={planInput} type="file" accept="application/json,.json" hidden onChange={(event) => void loadPlan(event.target.files?.[0])} />
+    <StoryboardBoard
     plan={plan}
     assetUrls={assetUrls}
     onPlanChange={setPlan}
@@ -84,5 +86,6 @@ export default function App() {
     notice={notice}
     onDismissNotice={() => setNotice(null)}
     key={plan.project.id}
-  />;
+    />
+  </>;
 }
