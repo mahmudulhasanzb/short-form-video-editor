@@ -67,14 +67,14 @@ export const VisualLayer: React.FC<{
         }
 
         if (element.kind === "shape") {
-          return <div key={element.id} style={base} />;
+          return <div key={element.id} style={animatedStyle} />;
         }
 
         return (
           <div
             key={element.id}
             style={{
-              ...base,
+              ...animatedStyle,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
