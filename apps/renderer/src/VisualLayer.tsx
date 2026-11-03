@@ -20,7 +20,7 @@ export const VisualLayer: React.FC<{
       {alternative.elements.map((element) => {
         const base = getVisualElementStyle(element);
         const motion = getVisualElementMotionStyle(frame, sceneDurationFrames, element.rotation, element.motion);
-        const animatedStyle = { ...base, ...motion };
+        const animatedStyle = { ...base, ...motion, opacity: element.opacity * motion.opacity };
 
         if (element.kind === "image" || element.kind === "icon") {
           return (
