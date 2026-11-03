@@ -131,7 +131,7 @@ function SourceFrame({ url, scene, fps, assets }: { url?: string | undefined; sc
       if (item.kind === "image" || item.kind === "icon" || item.kind === "video") {
         const mediaUrl = item.assetId ? assets[item.assetId] : undefined;
         return mediaUrl
-          ? <img key={item.id} src={mediaUrl} alt="" style={{ ...base, objectFit: String(visualStyle.objectFit ?? (item.kind === "video" ? "cover" : "contain")) as "cover" | "contain" | "fill" }} />
+          ? <img key={item.id} src={mediaUrl} alt="" style={{ ...base, objectFit: String(visualStyle.objectFit ?? (item.kind === "video" ? "cover" : "contain")) as "cover" | "contain" | "fill" | "none" | "scale-down" }} />
           : <div key={item.id} className="sb-frame-missing" style={base}>ASSET NOT ATTACHED</div>;
       }
       if (item.kind === "shape") {
@@ -149,7 +149,7 @@ function SourceFrame({ url, scene, fps, assets }: { url?: string | undefined; sc
         textAlign: String(visualStyle.textAlign ?? "center") as "left" | "center" | "right",
       }}>{item.text}</div>;
     })}
-    {scene.captions.enabled && chunk && <div className={"sb-frame-caption position-" + style.position} style={{
+    {scene.captions.enabled && chunk && <div className={"sb-frame-caption" + (split ? " position-bottom" : " position-" + style.position)} style={{
       color: style.textColor,
       fontSize: "clamp(8px, 1.15vw, 13px)",
       bottom: split ? "52%" : undefined,
