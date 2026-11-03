@@ -44,13 +44,17 @@ function NumberInput({ value, min, max, step = 1, onChange }: {
     onChange={(event) => { if (event.target.value !== "") onChange(Number(event.target.value)); }} />;
 }
 
-function SourceFrame({ url, scene, fps }: { url?: string | undefined; scene: Scene; fps: number }) {
+function SourceFrame({ url, scene, fps, assets }: { url?: string | undefined; scene: Scene; fps: number; assets: Record<string, string> }) {
   const [still, setStill] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
+  const split = scene.layout === "split-50-50";
+  const visualHeight = split ? 50 : 100;
+  const middleFrame = Math.round(scene.startFrame + (scene.endFrame - scene.startFrame) * 0.45);
+
   useEffect(() => {
     setStill(null);
     setFailed(false);
-    if (!url) return;
+    if (!url || scene.layout === "full-canvas") return;
     let disposed = false;
     const video = document.createElement("video");
     video.preload = "auto";
@@ -58,7 +62,7 @@ function SourceFrame({ url, scene, fps }: { url?: string | undefined; scene: Sce
     video.playsInline = true;
     const onMetadata = () => {
       const duration = Number.isFinite(video.duration) ? video.duration : 0;
-      const middle = (scene.startFrame + (scene.endFrame - scene.startFrame) * 0.45) / fps;
+      const middle = middleFrame / fps;
       video.currentTime = Math.max(0, Math.min(Math.max(0, duration - 0.08), middle));
     };
     const onSeeked = () => {
@@ -87,25 +91,57 @@ function SourceFrame({ url, scene, fps }: { url?: string | undefined; scene: Sce
       video.removeAttribute("src");
       video.load();
     };
-  }, [url, scene.id, scene.startFrame, scene.endFrame, fps]);
+  }, [url, scene.id, scene.startFrame, scene.endFrame, scene.layout, fps, middleFrame]);
 
   const selected = scene.visual.selectedAlternativeId
     ? scene.visual.alternatives.find((item) => item.id === scene.visual.selectedAlternativeId)
     : undefined;
-  const midpoint = Math.round((scene.startFrame + scene.endFrame) / 2);
-  const chunk = scene.captions.chunks.find((item) => midpoint >= item.startFrame && midpoint < item.endFrame)
-    ?? scene.captions.chunks[0];
+  const chunk = scene.captions.chunks.find((item) => middleFrame >= item.startFrame && middleFrame < item.endFrame)
+    ?? scene.captions.chunks.reduce<CaptionChunk | undefined>((best, current) => {
+      if (!best) return current;
+      const currentDistance = Math.min(Math.abs(current.startFrame - middleFrame), Math.abs(current.endFrame - middleFrame));
+      const bestDistance = Math.min(Math.abs(best.startFrame - middleFrame), Math.abs(best.endFrame - middleFrame));
+      return currentDistance < bestDistance ? current : best;
+    }, undefined);
   const style = scene.captions.style;
 
   return <div className="sb-frame" aria-label={"Storyboard frame for " + scene.name}>
-    {still ? <img className="sb-source-still" src={still} alt="Source video frame at the middle of this scene" />
-      : <div className="sb-frame-empty"><Film size={24} /><span>{url ? (failed ? "Frame could not be decoded" : "Reading source frame…") : "Attach source video to create real scene thumbnails"}</span></div>}
-    {selected?.elements.filter((item) => item.kind === "text" && item.text).map((item) => {
+    {scene.layout !== "full-canvas" && (still
+      ? <img className="sb-source-still" style={split ? { top: "50%", height: "50%" } : undefined} src={still} alt="Actual source video frame from this scene" />
+      : <div className="sb-frame-empty" style={split ? { top: "50%", height: "50%" } : undefined}>
+        <Film size={24} /><span>{url ? (failed ? "Source frame could not be decoded" : "Reading actual source frame…") : "Attach the original footage to sample this scene"}</span>
+      </div>)}
+    {scene.layout === "full-canvas" && <div className="sb-frame-canvas" />}
+    {selected?.elements.map((item) => {
       const visualStyle = item.style as Record<string, unknown>;
-      return <div key={item.id} className="sb-frame-element" style={{
-        left: item.x + "%", top: item.y + "%", width: item.width + "%", height: item.height + "%",
-        zIndex: item.zIndex, opacity: item.opacity,
+      const top = item.y * visualHeight / 100;
+      const height = item.kind === "line" ? Math.max(0.4, Number(visualStyle.lineThickness ?? 4) / 19.2) : item.height * visualHeight / 100;
+      const base = {
+        position: "absolute" as const,
+        left: item.x + "%",
+        top: top + "%",
+        width: item.width + "%",
+        height: height + "%",
+        zIndex: item.zIndex,
+        opacity: item.opacity,
         transform: "rotate(" + (item.rotation ?? 0) + "deg)",
+        boxSizing: "border-box" as const,
+        overflow: "hidden" as const,
+      };
+      if (item.kind === "image" || item.kind === "icon" || item.kind === "video") {
+        const mediaUrl = item.assetId ? assets[item.assetId] : undefined;
+        return mediaUrl
+          ? <img key={item.id} src={mediaUrl} alt="" style={{ ...base, objectFit: String(visualStyle.objectFit ?? (item.kind === "video" ? "cover" : "contain")) as "cover" | "contain" | "fill" }} />
+          : <div key={item.id} className="sb-frame-missing" style={base}>ASSET NOT ATTACHED</div>;
+      }
+      if (item.kind === "shape") {
+        return <div key={item.id} style={{ ...base, background: String(visualStyle.background ?? "#a58cf0"), border: String(visualStyle.border ?? "none"), borderRadius: String(visualStyle.borderRadius ?? "0") }} />;
+      }
+      if (item.kind === "line") {
+        return <div key={item.id} style={{ ...base, background: String(visualStyle.background ?? visualStyle.color ?? "#ffffff") }} />;
+      }
+      return <div key={item.id} className="sb-frame-element" style={{
+        ...base,
         color: String(visualStyle.color ?? "#ffffff"),
         background: String(visualStyle.background ?? "transparent"),
         fontSize: "clamp(7px, 1.2vw, 14px)",
@@ -113,7 +149,13 @@ function SourceFrame({ url, scene, fps }: { url?: string | undefined; scene: Sce
         textAlign: String(visualStyle.textAlign ?? "center") as "left" | "center" | "right",
       }}>{item.text}</div>;
     })}
-    {scene.captions.enabled && chunk && <div className={"sb-frame-caption position-" + style.position} style={{ color: style.textColor, fontSize: "clamp(8px, 1.15vw, 13px)" }}>
+    {scene.captions.enabled && chunk && <div className={"sb-frame-caption position-" + style.position} style={{
+      color: style.textColor,
+      fontSize: "clamp(8px, 1.15vw, 13px)",
+      bottom: split ? "52%" : undefined,
+      top: split ? undefined : style.position === "top" ? "12%" : style.position === "center" ? "48%" : undefined,
+      transform: !split && style.position === "center" ? "translateY(-50%)" : undefined,
+    }}>
       {chunk.words.map((word) => <span key={word.id} style={word.highlighted ? { color: style.highlightColor } : undefined}>{word.text} </span>)}
     </div>}
     <span className="sb-frame-stamp">{timecode(scene.startFrame, fps)} — {timecode(scene.endFrame, fps)}</span>
@@ -273,7 +315,7 @@ export function StoryboardBoard({ plan, assetUrls, onPlanChange, onAttachAsset, 
 
           <div className="sb-scene-body">
             <div className="sb-scene-media">
-              <SourceFrame url={sourceUrl} scene={scene} fps={plan.project.fps} />
+              <SourceFrame url={sourceUrl} scene={scene} fps={plan.project.fps} assets={assetUrls} />
               <div className="sb-media-caption"><span>FRAME AT {timecode(Math.round((scene.startFrame + scene.endFrame) / 2), plan.project.fps)}</span><span>{alternative ? alternative.compositionType.replaceAll("-", " ").toUpperCase() : "SOURCE FOOTAGE"}</span></div>
             </div>
 
