@@ -2,7 +2,7 @@
 
 ## Goal
 
-Create an editable, validated scene plan and open it in the interactive editor. Do not render the final video. The plan should be specific to the source video rather than a preset slideshow.
+Create an editable, validated scene plan and open it as a storyboard. Do not render the final video. The storyboard is the primary editorial review artifact: one scene card per meaningful beat, in sequence, with real source-footage stills and the editable decisions for that scene beside the still. Do not build or launch a conventional video-editor workspace.
 
 ## Process
 
@@ -16,15 +16,24 @@ Create an editable, validated scene plan and open it in the interactive editor. 
 8. Compare each scene with its immediate neighbors and the wider sequence. Check the selected layout, composition type, element-kind structure, animation approach, and information hierarchy. When adjacent scenes repeat the same structure, redesign one only if a different composition communicates that beat more clearly; do not add decorative elements or force variety. Keep repetition when it deliberately communicates a progression, comparison, or recurring motif, and note that rationale in the scene visual rationale.
 9. Validate source trims and scene-relative overlay windows. Reject windows outside the scene, missing evidence, unresolved alternatives, and missing asset references.
 10. Save the validated scene-plan.json in the video's planning directory.
-11. Open the interactive editor using that exact plan.
-12. Wait for the user to review and edit the plan. Persist edits back to the same source-of-truth plan.
-13. The review surface must be genuinely editable, not a static HTML mockup: expose every generated scene, caption chunk, visual element, camera-motion choice, and sound cue that can be changed. Controls must write to the structured scene plan and refresh the preview from that same data. Do not hardcode generated wording, timings, sound selections, animation choices, or per-scene zoom settings into presentation-only markup.
-14. Provide direct controls for caption text and split/merge, timing, highlight words, font/animation; per-scene zoom/motion on/off and settings; per-element entrance/exit, delay, and duration; and sound cue selection/disable. Offer sensible defaults, but keep them changeable. If a choice is unsupported by the plan schema/editor, flag it as unsupported instead of displaying a fake or inert control.
-15. Stop. Final rendering belongs to the approved render workflow.
+11. Create the storyboard review surface from that exact validated JSON. The review surface is a scene-by-scene board—not a full video-editor dashboard. Each card includes:
+    - a real still sampled from the source video at a recorded representative timestamp;
+    - scene title, order, start/end time, and duration;
+    - transcript evidence and the intended viewer takeaway;
+    - visual treatment, alternative, and every editable layer;
+    - caption preview plus editable chunk/word timing and highlighting;
+    - per-scene camera motion and sound cues.
+12. Attach source footage locally and generate the stills from actual frames. Do not use stock or generated replacement imagery. If the runtime cannot access the source video, stop thumbnail generation and report the access limitation; never claim that placeholders are real frames.
+13. Keep controls inside their owning scene card. Every user-visible control must update the structured scene plan and the card's rendered preview. No inert controls, hardcoded sample data, or presentation-only edits.
+14. Expose scene timing/layout/evidence; visual type, alternative choice, element text/assets/transforms/style/entrance/exit; caption visibility, chunk and word correction, split/merge, timing, highlights, font and animation; per-scene camera movement; and independently editable sound cues with enable, asset, timing, duration, and level.
+15. Allow the user to review the whole sequence without a separate scene sidebar, giant central player, or a detached properties inspector. The output should read like a visual shot list / storyboard.
+16. Export the validated scene-plan.json. Edits must stay in the plan object; local browser blob URLs and file objects must never be serialized.
+17. Wait for the user to review and edit the storyboard. Do not render final video until explicit approval.
+18. Stop.
 
 ## Visual selection rules
 
-- Treat the editor's adjacent-scene repetition warning as a review prompt, not an automatic error. Inspect the actual meaning of both beats before changing either scene.
+- Treat repetition warnings as a review prompt, not an automatic error. Inspect the actual meaning of both beats before changing either scene.
 - Start with the idea, not a component library. Speaker-only is a valid and preferred choice when no supporting visual adds meaning.
 - Use diagrams for relationships, comparisons for contrasts, timelines for sequences, and real UI only for genuine interface concepts.
 - Do not turn every sentence, keyword, or number into a card. Avoid generic dashboard panels, floating pills, fake browser windows, and decorative widgets without clear explanatory purpose.
@@ -39,10 +48,11 @@ Each scene defines:
 
 - Stable scene ID and project frame range.
 - Layout and speaker crop where relevant.
+- Transcript evidence supporting the scene decision.
 - Visual type and structured visual alternatives/elements.
 - Caption chunks with editable words and frame timing.
 - Per-scene camera motion settings.
 - Sound effects with resolvable asset references.
-- Transcript evidence supporting the visual decision.
+- A representative source-frame timestamp retained in the storyboard output.
 
 Never silently invent missing values. Explicitly use a no-graphic/speaker-only scene when appropriate.
