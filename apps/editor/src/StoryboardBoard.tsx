@@ -123,7 +123,6 @@ function SourceFrame({ url, scene, fps }: { url?: string; scene: Scene; fps: num
 export function StoryboardBoard({ plan, assetUrls, onPlanChange, onAttachAsset, onExportPlan, onOpenPlan, notice, onDismissNotice }: Props) {
   const fileInput = useRef<HTMLInputElement>(null);
   const [pendingAssetId, setPendingAssetId] = useState<string | null>(null);
-  const [assetAccept, setAssetAccept] = useState("audio/*,image/*,video/*");
   const validation = useMemo(() => scenePlanSchema.safeParse(plan), [plan]);
   const activeAlternative = (scene: Scene) => scene.visual.selectedAlternativeId
     ? scene.visual.alternatives.find((item) => item.id === scene.visual.selectedAlternativeId) ?? null
@@ -134,8 +133,10 @@ export function StoryboardBoard({ plan, assetUrls, onPlanChange, onAttachAsset, 
   }
   function openAssetPicker(assetId: string, accept = "audio/*,image/*,video/*") {
     setPendingAssetId(assetId);
-    setAssetAccept(accept);
-    fileInput.current?.click();
+    if (fileInput.current) {
+      fileInput.current.accept = accept;
+      fileInput.current.click();
+    }
   }
   function updateElement(sceneId: string, alternativeId: string, elementId: string, patch: Partial<Element>) {
     mutateScene(sceneId, (scene) => ({ ...scene, visual: { ...scene.visual, alternatives: scene.visual.alternatives.map((alternative) =>
@@ -194,18 +195,12 @@ export function StoryboardBoard({ plan, assetUrls, onPlanChange, onAttachAsset, 
       volumeDb: -18, enabled: false
     }] }));
   }
-  function addSceneText(scene: Scene) {
-    if (!scene.visual.alternatives.length) { addAlternative(scene.id); return; }
-    const current = activeAlternative(scene);
-    if (current) addTextElement(scene.id, current.id);
-  }
-
   const sceneCount = plan.scenes.length;
   const sourceUrl = assetUrls[plan.source.videoAssetId];
   const attachedCount = Object.keys(assetUrls).length;
 
   return <main className="storyboard-app">
-    <input ref={fileInput} type="file" accept={assetAccept} hidden onChange={(event) => {
+    <input ref={fileInput} type="file" accept="audio/*,image/*,video/*" hidden onChange={(event) => {
       const file = event.target.files?.[0];
       if (file && pendingAssetId) onAttachAsset(pendingAssetId, file);
       setPendingAssetId(null);
