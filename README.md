@@ -15,25 +15,29 @@ Keep these command names unchanged:
 - **SKILL.md** — active agent instructions and command routing.
 - **workflows/** — command-specific procedures.
 - **references/** — reusable editing, visual-direction, sound-design, and verification guidance.
-- **packages/contracts/** — shared validated scene-plan contract.
-- **apps/editor/** — interactive scene-plan editor.
-- **apps/renderer/** — Remotion-based renderer.
+- **packages/contracts/** — shared validated scene-plan contract and tests.
+- **apps/editor/** — interactive scene-plan editor and Remotion Player preview.
+- **apps/renderer/** — shared Remotion composition and final-render CLI.
 - **scripts/** — reusable media inspection and verification utilities.
-- **assets/fonts/** — local font library; check each font's license before use.
-- **assets/sound-effects/** — local sound-effect library, organized by category.
+- **assets/fonts/** — local font library; inspect each font's license and renderer support before use.
+- **assets/sound-effects/** — local sound-effect library; audition candidates before selection.
 
-Per-video workspaces and generated outputs belong in the active project directory, never inside this repository or the installed skill. The repository does not contain a required example video, storyboard, or starter composition.
+Search the local font and sound-effect libraries first. If no suitable and permitted local asset exists, use a verifiable external or generated alternative only when available, and record its provenance. Preserve both local asset libraries.
+
+Per-video workspaces and generated outputs belong in the active project directory, never inside this repository or the installed skill. The current repository does not require a bundled example video, storyboard, or starter composition.
 
 ## Development
 
-This repository uses Bun workspaces.
+This repository uses Bun workspaces and the committed root `bun.lock`.
 
 ~~~bash
-bun install
+bun install --frozen-lockfile
 bun run typecheck
 bun run test
 bun run build
 ~~~
+
+The root validation scripts explicitly run the required workspace checks; missing scripts should fail rather than be silently skipped. The editor is validated with typecheck and production build; contracts and renderer run their automated tests.
 
 ## Global skill installation
 
