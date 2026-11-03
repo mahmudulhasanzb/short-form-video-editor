@@ -623,7 +623,12 @@ export default function App() {
                   <div className="section-divider" />
                   <div className="field-label">CAMERA MOTION</div>
                   <label className="toggle-row"><span>Enable motion</span><input type="checkbox" checked={selectedScene.cameraMotion.enabled} onChange={(event) => updateScene(selectedScene.id, (scene) => ({ ...scene, cameraMotion: { ...scene.cameraMotion, enabled: event.target.checked, type: event.target.checked ? scene.cameraMotion.type ?? "zoom-in" : null } }))} /></label>
-                  {selectedScene.cameraMotion.enabled && <label className="field-label">MOTION TYPE<select value={selectedScene.cameraMotion.type ?? "zoom-in"} onChange={(event) => updateScene(selectedScene.id, (scene) => ({ ...scene, cameraMotion: { ...scene.cameraMotion, type: event.target.value as NonNullable<typeof scene.cameraMotion.type> } }))}><option value="zoom-in">Zoom In</option><option value="zoom-out">Zoom Out</option><option value="pan-left">Pan Left</option><option value="pan-right">Pan Right</option></select></label>}
+                  {selectedScene.cameraMotion.enabled && (
+                    <>
+                      <label className="field-label">MOTION TYPE<select value={selectedScene.cameraMotion.type ?? "zoom-in"} onChange={(event) => updateScene(selectedScene.id, (scene) => ({ ...scene, cameraMotion: { ...scene.cameraMotion, type: event.target.value as NonNullable<typeof scene.cameraMotion.type> } }))}><option value="zoom-in">Zoom In</option><option value="zoom-out">Zoom Out</option><option value="pan-left">Pan Left</option><option value="pan-right">Pan Right</option></select></label>
+                      <label className="field-label">INTENSITY · {Math.round(selectedScene.cameraMotion.intensity * 100)}%<input type="range" min="0" max="1" step="0.05" value={selectedScene.cameraMotion.intensity} onChange={(event) => updateScene(selectedScene.id, (scene) => ({ ...scene, cameraMotion: { ...scene.cameraMotion, intensity: Number(event.target.value) } }))} /></label>
+                    </>
+                  )}
 
                   <div className="section-divider" />
                   <CaptionInspector scene={selectedScene} fps={plan.project.fps} onChange={(captions) => updateCaptions(selectedScene.id, captions)} />
